@@ -1,8 +1,8 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
   "name": "io.github.beepboop2025/liquilens",
-  "title": "LiquiLens — the Failure Radar",
-  "description": "Bank and lender failure early-warning over MCP: the live Failure Radar for Indian lenders, validated failure records for India (48 institutions), the US (550 FDIC failures) and Europe (audited case files), RBI registry and enforcement tape, and cryptographic record verification. Screens, not ratings.",
+  "title": "LiquiLens \u2014 the Failure Radar",
+  "description": "Bank and lender failure early warning, with a validated record across India, the US and Europe.",
   "version": "1.0.0",
   "repository": {
     "url": "https://github.com/beepboop2025/liquilens-mcp",
