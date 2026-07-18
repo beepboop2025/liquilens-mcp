@@ -41,5 +41,6 @@ are absent by design — the tools say so rather than inventing a score.
 - [Seiche](https://api.seiche.info/mcp) — US money-market funding stress (the plumbing)
 - [groundcheck](https://groundcheck.seiche.info) — claim grounding and citation verification
 - Palimpsest (`https://api.seiche.info/palimpsest/mcp`) — live internet-censorship signals
+- [Undertow](https://liquilens.in/undertow/) — the cross market liquidity map: daily tiered board, exit cost at position size, Telegram front door at [t.me/undertow_LiquiLens_bot](https://t.me/undertow_LiquiLens_bot)
 
 Product: [liquilens.in](https://liquilens.in) · Live demo: [demo.liquilens.in](https://demo.liquilens.in)
