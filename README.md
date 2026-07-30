@@ -6,6 +6,11 @@ LiquiLens is a failure early-warning system for banks and lenders, built on publ
 data with the validation record served beside every claim. This MCP server lets any
 LLM agent read the same record a human sees.
 
+It now reads both ends of the chain: which institutions are fragile, and whether that
+stress is actually crossing into the real economy: companies rolling paper and drawing
+credit lines, households falling behind. Channels that cannot be read are named in
+`cannot_see` rather than reported as calm.
+
 ## Add it
 
 Claude Code:
@@ -23,11 +28,13 @@ Claude.ai / ChatGPT / Cursor: add a custom connector or MCP server with the URL 
 | `evidence_markets` | The validation record per market, one headline each |
 | `evidence_india` | The Indian record: 48 institutions across two decades, misses and false alarms included |
 | `evidence_institution` | One Indian institution's full crisis replay with sourced quarterly rows |
-| `evidence_us` | The US record: 550 FDIC failures since 2008, 73.1% recall at 21.7-month median lead, marquee replays including the honest fraud miss |
+| `evidence_us` | The US record: 552 FDIC failures since 2008, 72.8% recall at 21.7-month median lead, marquee replays including the honest fraud miss |
 | `evidence_europe` | Seven audited European case files, Northern Rock to Credit Suisse, replayed through unrecalibrated lenses |
 | `universe_search` | RBI's official registered-NBFC registry (9,000+ entries) |
 | `rbi_supervisory_tape` | Latest RBI enforcement actions, each linking to the RBI's own page |
 | `verify_published_record` | Independent cryptographic verification of the as-published record |
+| `corporate_transmission_board` | Is funding stress reaching nonfinancial firms? The commercial-paper market, bank credit lines, real-economy confirmation (claims, capex, inventories, openings, business bankruptcies) and a balance-sheet context channel, with a TRANSMITTING/CONTAINED verdict |
+| `household_credit_board` | Is stress transmitting through household balance sheets? Fed delinquency and charge-off legs against each leg's own trailing decade, two-sided revolving-credit velocity, debt service as unscored context |
 
 ## The governance line
 
