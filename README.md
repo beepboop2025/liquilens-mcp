@@ -2,6 +2,9 @@
 
 **Endpoint:** `https://api.liquilens.in/mcp` (streamable HTTP, no auth, no install)
 
+**Try it live:** [liquilens.in/developers](https://liquilens.in/developers/) ·
+**REST catalog:** [api.liquilens.in/api](https://api.liquilens.in/api)
+
 LiquiLens is a failure early-warning system for banks and lenders, built on public
 data with the validation record served beside every claim. This MCP server lets any
 LLM agent read the same record a human sees.
@@ -35,6 +38,8 @@ Claude.ai / ChatGPT / Cursor: add a custom connector or MCP server with the URL 
 | `verify_published_record` | Independent cryptographic verification of the as-published record |
 | `corporate_transmission_board` | Is funding stress reaching nonfinancial firms? The commercial-paper market, bank credit lines, real-economy confirmation (claims, capex, inventories, openings, business bankruptcies) and a balance-sheet context channel, with a TRANSMITTING/CONTAINED verdict |
 | `household_credit_board` | Is stress transmitting through household balance sheets? Fed delinquency and charge-off legs against each leg's own trailing decade, two-sided revolving-credit velocity, debt service as unscored context |
+| `forward_odds` | Counted forward stress odds for each public-signal layer, withheld until the layer has enough observed history |
+| `institution_review_packet` | One lender's deterministic evidence packet for human review, with coverage and freshness stated explicitly |
 
 ## The governance line
 
@@ -48,6 +53,6 @@ are absent by design — the tools say so rather than inventing a score.
 - [Seiche](https://api.seiche.info/mcp) — US money-market funding stress (the plumbing)
 - [groundcheck](https://groundcheck.seiche.info) — claim grounding and citation verification
 - Palimpsest (`https://api.seiche.info/palimpsest/mcp`) — live internet-censorship signals
-- [Undertow](https://liquilens.in/undertow/) — the cross market liquidity map: daily tiered board, exit cost at position size, Telegram front door at [t.me/undertow_LiquiLens_bot](https://t.me/undertow_LiquiLens_bot)
+- [Undertow](https://liquilens-undertow.com/developers/) — the cross market liquidity map: daily tiered board, exit cost at position size, Telegram front door at [t.me/undertow_LiquiLens_bot](https://t.me/undertow_LiquiLens_bot)
 
 Product: [liquilens.in](https://liquilens.in) · Live demo: [demo.liquilens.in](https://demo.liquilens.in)
