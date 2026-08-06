@@ -1,8 +1,8 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.beepboop2025/liquilens",
-  "title": "LiquiLens — the Failure Radar",
-  "description": "Bank and lender failure early warning, and whether that stress is reaching firms and households.",
+  "title": "LiquiLens bank and lender failure-risk tools",
+  "description": "Public-data early warning for bank and lender distress, with validation evidence and transmission signals.",
   "version": "1.4.1",
   "repository": {
     "url": "https://github.com/beepboop2025/liquilens-mcp",

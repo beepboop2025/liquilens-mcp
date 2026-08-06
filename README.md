@@ -1,18 +1,16 @@
-# LiquiLens MCP — the Failure Radar as agent tools
+# LiquiLens MCP | Bank and lender failure-risk tools
 
 **Endpoint:** `https://api.liquilens.in/mcp` (streamable HTTP, no auth, no install)
 
 **Try it live:** [liquilens.in/developers](https://liquilens.in/developers/) ·
 **REST catalog:** [api.liquilens.in/api](https://api.liquilens.in/api)
 
-LiquiLens is a failure early-warning system for banks and lenders, built on public
-data with the validation record served beside every claim. This MCP server lets any
-LLM agent read the same record a human sees.
+LiquiLens is an early-warning system for bank and lender distress, built from public
+data with validation evidence published beside its claims. This MCP server exposes
+the same record as structured tools.
 
-It now reads both ends of the chain: which institutions are fragile, and whether that
-stress is actually crossing into the real economy: companies rolling paper and drawing
-credit lines, households falling behind. Channels that cannot be read are named in
-`cannot_see` rather than reported as calm.
+The tools cover institution risk and signs that funding stress is reaching companies or
+households. Unavailable channels are listed in `cannot_see` rather than reported as calm.
 
 ## Add it
 
@@ -41,7 +39,7 @@ Claude.ai / ChatGPT / Cursor: add a custom connector or MCP server with the URL 
 | `forward_odds` | Counted forward stress odds for each public-signal layer, withheld until the layer has enough observed history |
 | `institution_review_packet` | One lender's deterministic evidence packet for human review, with coverage and freshness stated explicitly |
 
-## The governance line
+## Scoring boundary
 
 The generative layer explains; **only the validated deterministic layer scores.**
 Numbers come from deterministic engines with model cards, never from a model.
@@ -50,9 +48,9 @@ are absent by design — the tools say so rather than inventing a score.
 
 ## Siblings from the same lab
 
-- [Seiche](https://api.seiche.info/mcp) — US money-market funding stress (the plumbing)
-- [groundcheck](https://groundcheck.seiche.info) — claim grounding and citation verification
-- Palimpsest (`https://api.seiche.info/palimpsest/mcp`) — live internet-censorship signals
-- [Undertow](https://liquilens-undertow.com/developers/) — the cross market liquidity map: daily tiered board, exit cost at position size, Telegram front door at [t.me/undertow_LiquiLens_bot](https://t.me/undertow_LiquiLens_bot)
+- [Seiche](https://api.seiche.info/mcp): US dollar funding stress
+- [Groundcheck](https://groundcheck.seiche.info): live-source claim and citation verification
+- Palimpsest (`https://api.seiche.info/palimpsest/mcp`): internet-censorship signals
+- [Undertow](https://liquilens-undertow.com/developers/): market-liquidity tiers and estimated exit cost by position size
 
-Product: [liquilens.in](https://liquilens.in) · Live demo: [demo.liquilens.in](https://demo.liquilens.in)
+Product: [liquilens.in](https://liquilens.in). The [interactive demo](https://demo.liquilens.in) requires sign-in and is available by request.
