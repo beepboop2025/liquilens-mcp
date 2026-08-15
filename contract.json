@@ -1,0 +1,40 @@
+{
+  "canonical": {
+    "releaseCommit": "e9d007088ced733ebe665ea07b46b0bec0260a48",
+    "repository": "https://github.com/beepboop2025/LiquiLens"
+  },
+  "serverVersion": "1.7.0",
+  "protocolVersions": [
+    "2026-07-28",
+    "2025-11-25",
+    "2025-06-18",
+    "2025-03-26"
+  ],
+  "tools": [
+    "corporate_transmission_board",
+    "crypto_exposure_board",
+    "crypto_regime_board",
+    "evidence_europe",
+    "evidence_india",
+    "evidence_institution",
+    "evidence_markets",
+    "evidence_us",
+    "failure_radar_board",
+    "failure_radar_institution",
+    "forward_odds",
+    "household_credit_board",
+    "institution_review_packet",
+    "latest_article",
+    "rbi_supervisory_tape",
+    "stablecoin_rails_board",
+    "universe_search",
+    "verify_published_record"
+  ],
+  "prompts": [
+    "crypto_liquidity_briefing",
+    "failure_radar_briefing",
+    "institution_health_check",
+    "stress_evidence_pack"
+  ],
+  "resourceTemplates": []
+}
