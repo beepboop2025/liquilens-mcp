@@ -64,7 +64,25 @@ class ListingContractTests(unittest.TestCase):
             names = self.contract[field]
             self.assertEqual(names, sorted(set(names)))
             self.assertTrue(all(re.fullmatch(r"[a-z][a-z0-9_]+", n) for n in names))
+        self.assertEqual(len(self.contract["tools"]), 18)
+        self.assertEqual(len(self.contract["prompts"]), 4)
         self.assertEqual(self.contract["resourceTemplates"], [])
+
+    def test_pin_sha_version_and_tools_stay_consistent(self) -> None:
+        pin = self.contract["canonical"]["releaseCommit"]
+        version = self.contract["serverVersion"]
+        tools = self.contract["tools"]
+        prompts = self.contract["prompts"]
+
+        self.assertEqual(self.server["version"], version)
+        self.assertIn(pin, self.readme)
+        self.assertIn(f"MCP {version}", self.readme)
+        self.assertIn(
+            f"{len(tools)} read-only tools and {len(prompts)} guided prompts",
+            self.readme,
+        )
+        for name in (*tools, *prompts):
+            self.assertIn(f"`{name}`", self.readme)
 
     def test_server_manifest_matches_the_canonical_contract(self) -> None:
         self.assertEqual(self.server["version"], self.contract["serverVersion"])

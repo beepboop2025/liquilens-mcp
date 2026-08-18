@@ -8,7 +8,9 @@
 LiquiLens is a failure early-warning system for banks and lenders, built on public
 data with a machine-readable historical-evidence boundary served beside every claim.
 This MCP 1.7.0 endpoint exposes 18 read-only tools and 4 guided prompts so an agent
-reads the same status, eligibility flags and cited record a human sees.
+reads the same status, eligibility flags and cited record a human sees. Its
+capability inventory is pinned to LiquiLens commit
+`fbb431233533ada87249ba3bb8d002a8533d120b`.
 
 It now reads both ends of the chain: which institutions are fragile, and whether that
 stress is actually crossing into the real economy: companies rolling paper and drawing
