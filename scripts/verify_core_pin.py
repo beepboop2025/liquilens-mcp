@@ -1,0 +1,119 @@
+#!/usr/bin/env python3
+"""Verify this listing against the exact pinned LiquiLens source checkout."""
+
+from __future__ import annotations
+
+import argparse
+import ast
+import json
+import subprocess
+from pathlib import Path
+from typing import Any
+
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def _json(path: Path) -> dict[str, Any]:
+    value = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(value, dict):
+        raise ValueError(f"{path} must contain an object")
+    return value
+
+
+def _module(path: Path) -> ast.Module:
+    return ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+
+
+def _assignment(tree: ast.Module, name: str) -> ast.expr:
+    for node in tree.body:
+        if isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name):
+            if node.target.id == name and node.value is not None:
+                return node.value
+        if isinstance(node, ast.Assign):
+            if any(isinstance(target, ast.Name) and target.id == name
+                   for target in node.targets):
+                return node.value
+    raise ValueError(f"assignment {name} not found")
+
+
+def _mapping_keys(tree: ast.Module, name: str) -> list[str]:
+    value = _assignment(tree, name)
+    if not isinstance(value, ast.Dict):
+        raise ValueError(f"{name} must be a dictionary literal")
+    keys = [ast.literal_eval(key) for key in value.keys]
+    if not all(isinstance(key, str) for key in keys):
+        raise ValueError(f"{name} contains a non-string key")
+    if len(keys) != len(set(keys)):
+        raise ValueError(f"{name} contains a duplicate key")
+    return keys
+
+
+def _literal(tree: ast.Module, name: str) -> Any:
+    return ast.literal_eval(_assignment(tree, name))
+
+
+def verify(core: Path) -> None:
+    contract = _json(ROOT / "contract.json")
+    listing_server = _json(ROOT / "server.json")
+    expected_sha = contract["canonical"]["releaseCommit"]
+    actual_sha = subprocess.check_output(
+        ["git", "-C", str(core), "rev-parse", "HEAD"], text=True
+    ).strip()
+    if actual_sha != expected_sha:
+        raise ValueError(f"core checkout is {actual_sha}, listing pins {expected_sha}")
+
+    server_tree = _module(core / "backend" / "mcp_server.py")
+    protocol_tree = _module(core / "backend" / "mcp_protocol.py")
+    core_server = _json(core / "server.json")
+
+    actual_tools = sorted(_mapping_keys(server_tree, "TOOLS"))
+    actual_prompts = sorted(_mapping_keys(server_tree, "PROMPTS"))
+    modern = _literal(protocol_tree, "MODERN_PROTOCOL_VERSION")
+    primary = _literal(protocol_tree, "PROTOCOL_VERSION")
+    legacy_node = _assignment(protocol_tree, "LEGACY_PROTOCOL_VERSIONS")
+    if not isinstance(legacy_node, (ast.Tuple, ast.List)):
+        raise ValueError("LEGACY_PROTOCOL_VERSIONS must be a literal sequence")
+    legacy = [
+        primary if isinstance(item, ast.Name) and item.id == "PROTOCOL_VERSION"
+        else ast.literal_eval(item)
+        for item in legacy_node.elts
+    ]
+    actual_protocols = [modern, *legacy]
+
+    comparisons = {
+        "tools": (actual_tools, contract["tools"]),
+        "prompts": (actual_prompts, contract["prompts"]),
+        "protocolVersions": (actual_protocols, contract["protocolVersions"]),
+        "serverVersion": (
+            _literal(protocol_tree, "SERVER_VERSION"),
+            contract["serverVersion"],
+        ),
+        "core server version": (core_server["version"], listing_server["version"]),
+        "core server name": (core_server["name"], listing_server["name"]),
+        "core remotes": (core_server["remotes"], listing_server["remotes"]),
+    }
+    mismatches = [
+        f"{label}: core={actual!r}, listing={expected!r}"
+        for label, (actual, expected) in comparisons.items()
+        if actual != expected
+    ]
+    if mismatches:
+        raise ValueError("listing/core contract mismatch:\n" + "\n".join(mismatches))
+
+    print(
+        f"core pin valid: {expected_sha} exposes {len(actual_tools)} tools, "
+        f"{len(actual_prompts)} prompts and MCP {contract['serverVersion']}"
+    )
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--core", required=True, type=Path)
+    args = parser.parse_args()
+    verify(args.core.resolve())
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

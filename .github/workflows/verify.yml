@@ -4,6 +4,9 @@ on:
   push:
     branches: [master]
   pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 3 * * *"
 
 permissions:
   contents: read
@@ -22,5 +25,34 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Read the pinned LiquiLens revision
+        id: core-pin
+        run: |
+          echo "sha=$(python3 -c 'import json; print(json.load(open("contract.json"))["canonical"]["releaseCommit"])')" >> "$GITHUB_OUTPUT"
+
+      - name: Check out the exact LiquiLens core revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: beepboop2025/LiquiLens
+          ref: ${{ steps.core-pin.outputs.sha }}
+          path: .core/LiquiLens
+          ssh-key: ${{ secrets.LIQUILENS_CORE_DEPLOY_KEY }}
+          persist-credentials: false
+
       - name: Verify listing contract
-        run: python3 -m unittest discover -s tests -v
+        run: |
+          python3 -m unittest discover -s tests -v
+          python3 scripts/verify_core_pin.py --core .core/LiquiLens
+
+  live-smoke:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Check out the reviewed commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Smoke the public MCP discovery and one read-only tool
+        run: python3 scripts/smoke_live_mcp.py
