@@ -36,6 +36,7 @@ jobs:
           repository: beepboop2025/LiquiLens
           ref: ${{ steps.core-pin.outputs.sha }}
           path: .core/LiquiLens
+          ssh-key: ${{ secrets.LIQUILENS_CORE_DEPLOY_KEY }}
           persist-credentials: false
 
       - name: Verify listing contract
