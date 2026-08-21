@@ -25,10 +25,10 @@ Claude Code:
 
 Claude.ai / ChatGPT / Cursor: add a custom connector or MCP server with the URL above.
 
-This repository is the discovery and documentation mirror. The signed implementation
-and registry manifest live in the
-[LiquiLens core repository](https://github.com/beepboop2025/LiquiLens). The official
-registry currently serves
+This repository is the public discovery and documentation mirror. The hosted
+implementation is maintained in a private core repository; this mirror publishes the
+exact capability contract and release metadata that outside reviewers can inspect. The
+signed manifest is available through the official registry, which currently serves
 [`io.github.beepboop2025/liquilens` version 1.7.0](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.beepboop2025%2Fliquilens/versions/latest).
 
 ## Protocol compatibility
