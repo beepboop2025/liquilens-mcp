@@ -12,6 +12,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 MAX_RESPONSE_BYTES = 2_000_000
+OPERATOR_CLIENT = "LiquiLens-Operator-Growth-Audit"
 
 
 def _rpc(endpoint: str, method: str, params: dict[str, Any], request_id: int,
@@ -24,7 +25,8 @@ def _rpc(endpoint: str, method: str, params: dict[str, Any], request_id: int,
         "Content-Type": "application/json",
         "MCP-Protocol-Version": protocol,
         "Mcp-Method": method,
-        "User-Agent": "liquilens-mcp-scheduled-smoke/1.0",
+        "User-Agent": f"{OPERATOR_CLIENT}/1.0",
+        "X-Liquilens-Traffic-Class": "synthetic",
     }
     if name is not None:
         headers["Mcp-Name"] = name
@@ -36,7 +38,8 @@ def _rpc(endpoint: str, method: str, params: dict[str, Any], request_id: int,
     if len(body) > MAX_RESPONSE_BYTES:
         raise RuntimeError(f"{method} exceeded the smoke response budget")
     value = json.loads(body)
-    if not isinstance(value, dict) or value.get("id") != request_id:
+    if (not isinstance(value, dict) or value.get("jsonrpc") != "2.0"
+            or type(value.get("id")) is not int or value["id"] != request_id):
         raise RuntimeError(f"{method} returned an invalid JSON-RPC envelope")
     if "error" in value:
         raise RuntimeError(f"{method} returned JSON-RPC error {value['error']!r}")
@@ -50,7 +53,7 @@ def modern_meta(protocol: str) -> dict[str, Any]:
     return {
         "io.modelcontextprotocol/protocolVersion": protocol,
         "io.modelcontextprotocol/clientInfo": {
-            "name": "liquilens-listing-smoke", "version": "1.0.0",
+            "name": OPERATOR_CLIENT, "version": "1.0.0",
         },
         "io.modelcontextprotocol/clientCapabilities": {},
     }
@@ -62,7 +65,7 @@ def smoke(endpoint: str) -> None:
     initialized = _rpc(endpoint, "initialize", {
         "protocolVersion": legacy,
         "capabilities": {},
-        "clientInfo": {"name": "liquilens-listing-smoke", "version": "1.0.0"},
+        "clientInfo": {"name": OPERATOR_CLIENT, "version": "1.0.0"},
     }, 1, protocol=legacy)
     if initialized.get("serverInfo", {}).get("version") != contract["serverVersion"]:
         raise RuntimeError("live server version differs from the listing")
