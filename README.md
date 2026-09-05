@@ -7,10 +7,10 @@
 
 LiquiLens is a failure early-warning system for banks and lenders, built on public
 data with a machine-readable historical-evidence boundary served beside every claim.
-This MCP 1.7.0 endpoint exposes 18 read-only tools and 4 guided prompts so an agent
+This MCP 1.8.0 endpoint exposes 21 read-only tools and 5 guided prompts so an agent
 reads the same status, eligibility flags and cited record a human sees. Its
 capability inventory is pinned to LiquiLens commit
-`5628b41bd9ef1e753dafba72e29b6b303ec18e3d`.
+`ad759890fbd3656397c3c28ab8f3b0b845aeede9`.
 
 It now reads both ends of the chain: which institutions are fragile, and whether that
 stress is actually crossing into the real economy: companies rolling paper and drawing
@@ -23,13 +23,51 @@ Claude Code:
 
     claude mcp add --transport http liquilens https://api.liquilens.in/mcp
 
-Claude.ai / ChatGPT / Cursor: add a custom connector or MCP server with the URL above.
+Codex:
+
+    codex mcp add liquilens --url https://api.liquilens.in/mcp
+
+Cursor: merge the [remote MCP config](https://liquilens.in/developers/recipes/cursor-mcp.json)
+into `.cursor/mcp.json` for one project or `~/.cursor/mcp.json` for all projects.
+The download includes the companion Seiche funding endpoint. Preserve existing entries.
+For an existing Codex config, use the [TOML snippet](https://liquilens.in/developers/recipes/codex-mcp.toml)
+and merge its server entries into `~/.codex/config.toml`.
+
+Claude.ai / ChatGPT: add a custom connector or MCP app with the endpoint above where
+that feature is available in your workspace.
 
 This repository is the public discovery and documentation mirror. The hosted
-implementation is maintained in a private core repository; this mirror publishes the
-exact capability contract and release metadata that outside reviewers can inspect. The
-signed manifest is available through the official registry, which currently serves
-[`io.github.beepboop2025/liquilens` version 1.7.0](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.beepboop2025%2Fliquilens/versions/latest).
+implementation is maintained in a private core repository. This public mirror pins
+its inspectable capability contract to the reviewed source revision above.
+The official Registry already serves
+[`io.github.beepboop2025/liquilens` version 1.8.0](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.beepboop2025%2Fliquilens/versions/1.8.0).
+This update reconciles the mirror with that release; it does not publish a new Registry version.
+
+## Run a research task
+
+The [research recipes](https://liquilens.in/developers/#research-recipes) run with
+Python 3.11+ and its standard library. No API key, LLM or Python package install is needed.
+[Download and inspect `financial_research.py`](https://liquilens.in/developers/recipes/financial_research.py),
+then run:
+
+```sh
+python3 financial_research.py bank-review
+python3 financial_research.py bank-review --slug cosmos-ucb
+python3 financial_research.py funding-brief
+```
+
+The first command discovers covered bank slugs. The second checks coverage before
+retrieving that exact bank's sourced asset-quality history; an absent slug stays
+`not_covered`. The funding brief calls Seiche's money-market desk. Returned evidence
+retains its native source dates, eligibility, unavailable states and limitations;
+a successful request does not imply fresh or complete evidence. Each run is bounded
+and performs no scheduling or trading. Operators should add `--verification` so their
+checks are labelled synthetic and excluded from adoption totals.
+
+For a visual workflow, [download the n8n bank-review workflow](https://liquilens.in/developers/recipes/n8n-bank-review.json)
+and follow the [import guide](https://liquilens.in/developers/recipes/n8n-bank-review.md).
+It uses a manual trigger and no LLM. The guide records its execution-verification status;
+a downloadable workflow does not imply acceptance into n8n's template library.
 
 ## Protocol compatibility
 
@@ -47,6 +85,9 @@ signed manifest is available through the official registry, which currently serv
 
 | Tool | What it serves |
 |---|---|
+| `bank_asset_quality_review` | Exact-slug bank review with sourced GNPA/NNPA history, percentage-point changes, distinct PCR definitions and capital/supervisory scope; no new score or credit approval |
+| `bank_npa_reconciliation` | Arithmetic check of a complete caller-supplied NPA movement table; keeps cash recoveries, write-offs, sales and upgrades distinct without authenticating the input |
+| `banking_specialisation_coverage` | Discover covered Indian commercial, small finance and urban cooperative banks, with observed, stale, historical and absent evidence distinguished; not a census or rating |
 | `corporate_transmission_board` | Is funding stress reaching nonfinancial firms? The commercial-paper market, bank credit lines, real-economy confirmation (claims, capex, inventories, openings, business bankruptcies) and a balance-sheet context channel, with a TRANSMITTING/CONTAINED verdict |
 | `crypto_exposure_board` | Cited bank/crypto exposure register joined to Undertow run-risk context; display-only, never an institution score |
 | `crypto_regime_board` | Compact BTC/ETH change-point state and its display-only cross-read against disclosed bank exposure |
@@ -70,6 +111,7 @@ signed manifest is available through the official registry, which currently serv
 
 | Prompt | Guided playbook |
 |---|---|
+| `bank_asset_quality_brief` | Discover an exact bank slug, review cited NPA history and capital scope, then reconcile only a complete disclosed movement table; preserve stale/missing evidence and supervisory gaps |
 | `crypto_liquidity_briefing` | BTC/ETH regime, stablecoin rails, and disclosed bank links in one display-only evidence pack |
 | `failure_radar_briefing` | Board-level institution risk with transmission context from the public US signal layers |
 | `institution_health_check` | One lender health check with the historical-evidence boundary and uncertainty attached |

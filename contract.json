@@ -1,9 +1,9 @@
 {
   "canonical": {
-    "releaseCommit": "5628b41bd9ef1e753dafba72e29b6b303ec18e3d",
+    "releaseCommit": "ad759890fbd3656397c3c28ab8f3b0b845aeede9",
     "repository": "https://github.com/beepboop2025/LiquiLens"
   },
-  "serverVersion": "1.7.0",
+  "serverVersion": "1.8.0",
   "protocolVersions": [
     "2026-07-28",
     "2025-11-25",
@@ -11,6 +11,9 @@
     "2025-03-26"
   ],
   "tools": [
+    "bank_asset_quality_review",
+    "bank_npa_reconciliation",
+    "banking_specialisation_coverage",
     "corporate_transmission_board",
     "crypto_exposure_board",
     "crypto_regime_board",
@@ -31,6 +34,7 @@
     "verify_published_record"
   ],
   "prompts": [
+    "bank_asset_quality_brief",
     "crypto_liquidity_briefing",
     "failure_radar_briefing",
     "institution_health_check",

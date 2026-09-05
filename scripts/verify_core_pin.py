@@ -37,11 +37,20 @@ def _assignment(tree: ast.Module, name: str) -> ast.expr:
     raise ValueError(f"assignment {name} not found")
 
 
-def _mapping_keys(tree: ast.Module, name: str) -> list[str]:
+def _mapping_keys(tree: ast.Module, name: str,
+                  expansions: dict[str, list[str]] | None = None) -> list[str]:
     value = _assignment(tree, name)
     if not isinstance(value, ast.Dict):
         raise ValueError(f"{name} must be a dictionary literal")
-    keys = [ast.literal_eval(key) for key in value.keys]
+    keys = []
+    for key, item in zip(value.keys, value.values):
+        if key is not None:
+            keys.append(ast.literal_eval(key))
+        elif (isinstance(item, ast.Name) and expansions is not None
+              and item.id in expansions):
+            keys.extend(expansions[item.id])
+        else:
+            raise ValueError(f"{name} contains an unsupported dictionary expansion")
     if not all(isinstance(key, str) for key in keys):
         raise ValueError(f"{name} contains a non-string key")
     if len(keys) != len(set(keys)):
@@ -67,8 +76,23 @@ def verify(core: Path) -> None:
     protocol_tree = _module(core / "backend" / "mcp_protocol.py")
     core_server = _json(core / "server.json")
 
-    actual_tools = sorted(_mapping_keys(server_tree, "TOOLS"))
-    actual_prompts = sorted(_mapping_keys(server_tree, "PROMPTS"))
+    # Resolve only the explicitly imported bank inventories, without importing or
+    # executing the application. Unknown expansions and duplicate keys fail closed.
+    bank_tree = _module(core / "backend" / "mcp_bank_tools.py")
+    bank_imports = {
+        alias.name for node in server_tree.body
+        if isinstance(node, ast.ImportFrom) and node.module == "mcp_bank_tools"
+        and node.level == 0
+        for alias in node.names if alias.asname is None
+    }
+    if not {"BANK_TOOLS", "BANK_PROMPTS"} <= bank_imports:
+        raise ValueError("core must import BANK_TOOLS and BANK_PROMPTS from mcp_bank_tools")
+    actual_tools = sorted(_mapping_keys(server_tree, "TOOLS", {
+        "BANK_TOOLS": _mapping_keys(bank_tree, "BANK_TOOLS"),
+    }))
+    actual_prompts = sorted(_mapping_keys(server_tree, "PROMPTS", {
+        "BANK_PROMPTS": _mapping_keys(bank_tree, "BANK_PROMPTS"),
+    }))
     modern = _literal(protocol_tree, "MODERN_PROTOCOL_VERSION")
     primary = _literal(protocol_tree, "PROTOCOL_VERSION")
     legacy_node = _assignment(protocol_tree, "LEGACY_PROTOCOL_VERSIONS")
@@ -89,9 +113,7 @@ def verify(core: Path) -> None:
             _literal(protocol_tree, "SERVER_VERSION"),
             contract["serverVersion"],
         ),
-        "core server version": (core_server["version"], listing_server["version"]),
-        "core server name": (core_server["name"], listing_server["name"]),
-        "core remotes": (core_server["remotes"], listing_server["remotes"]),
+        "core server manifest": (core_server, listing_server),
     }
     mismatches = [
         f"{label}: core={actual!r}, listing={expected!r}"
