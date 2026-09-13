@@ -7,10 +7,10 @@
 
 LiquiLens is a failure early-warning system for banks and lenders, built on public
 data with a machine-readable historical-evidence boundary served beside every claim.
-This MCP 1.8.0 endpoint exposes 21 read-only tools and 5 guided prompts so an agent
+This MCP 1.8.0 endpoint exposes 22 read-only tools and 5 guided prompts so an agent
 reads the same status, eligibility flags and cited record a human sees. Its
 capability inventory is pinned to LiquiLens commit
-`ad759890fbd3656397c3c28ab8f3b0b845aeede9`.
+`ca0e7a07008a29f1c881b18c622f172f82b919ef`.
 
 It now reads both ends of the chain: which institutions are fragile, and whether that
 stress is actually crossing into the real economy: companies rolling paper and drawing
@@ -103,6 +103,7 @@ a downloadable workflow does not imply acceptance into n8n's template library.
 | `institution_review_packet` | One lender's deterministic evidence packet for human review, with coverage and freshness stated explicitly |
 | `latest_article` | Today's exact evidence-led LiquiLens article, or a labelled historical replay when the evidence did not move |
 | `rbi_supervisory_tape` | Latest RBI enforcement actions, each linking to the RBI's own page |
+| `research_network` | Bounded source discovery for connected Palimpsest, Seiche and Undertow research with availability and evidence boundaries intact |
 | `stablecoin_rails_board` | Issuer peg, redemption-run, chain-concentration and rail tripwire state; missing data never becomes `CALM` |
 | `universe_search` | RBI's official registered-NBFC registry (9,000+ entries) |
 | `verify_published_record` | Independent cryptographic verification of the as-published record |
