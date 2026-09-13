@@ -1,6 +1,6 @@
 {
   "canonical": {
-    "releaseCommit": "ad759890fbd3656397c3c28ab8f3b0b845aeede9",
+    "releaseCommit": "ca0e7a07008a29f1c881b18c622f172f82b919ef",
     "repository": "https://github.com/beepboop2025/LiquiLens"
   },
   "serverVersion": "1.8.0",
@@ -29,6 +29,7 @@
     "institution_review_packet",
     "latest_article",
     "rbi_supervisory_tape",
+    "research_network",
     "stablecoin_rails_board",
     "universe_search",
     "verify_published_record"
