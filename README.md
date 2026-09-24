@@ -19,6 +19,19 @@ credit lines, households falling behind. Channels that cannot be read are named 
 
 ## Add it
 
+For Hermes and OpenClaw, use the native setup guides:
+
+- [Hermes: configuration, connection checks and a first research task](https://liquilens.in/agents/hermes/)
+- [OpenClaw: configuration, discovery checks and a first research task](https://liquilens.in/agents/openclaw/)
+
+The guides select nine research tools across LiquiLens and its Seiche funding
+and Undertow market-depth companions. They record the tested client versions and
+the exact verification scope. Public research requires no account or API key;
+fair-use limits apply and your model provider may charge separately.
+
+The [free starter kit](https://liquilens.in/agents/) also includes a Python brief,
+a manual n8n funding workflow and configurations for the clients below.
+
 Claude Code:
 
     claude mcp add --transport http liquilens https://api.liquilens.in/mcp
