@@ -1,7 +1,25 @@
 {
   "canonical": {
     "releaseCommit": "ca0e7a07008a29f1c881b18c622f172f82b919ef",
-    "repository": "https://github.com/beepboop2025/LiquiLens"
+    "repository": "https://github.com/beepboop2025/LiquiLens",
+    "serverManifest": {
+      "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+      "name": "io.github.beepboop2025/liquilens",
+      "title": "LiquiLens \u2014 the Failure Radar",
+      "description": "Free bank research: NPA reconciliation, small finance banks, UCBs and cited evidence limits.",
+      "version": "1.8.0",
+      "repository": {
+        "url": "https://github.com/beepboop2025/LiquiLens",
+        "source": "github"
+      },
+      "websiteUrl": "https://liquilens.in",
+      "remotes": [
+        {
+          "type": "streamable-http",
+          "url": "https://api.liquilens.in/mcp"
+        }
+      ]
+    }
   },
   "serverVersion": "1.8.0",
   "protocolVersions": [
@@ -41,5 +59,11 @@
     "institution_health_check",
     "stress_evidence_pack"
   ],
-  "resourceTemplates": []
+  "resourceTemplates": [],
+  "registryMetadata": {
+    "version": "1.8.1",
+    "repositoryUrl": "https://github.com/beepboop2025/liquilens-mcp",
+    "websiteUrl": "https://liquilens.in/agents/",
+    "description": "Free bank-filing and counterparty research; cited evidence limits; public MCP needs no API key."
+  }
 }

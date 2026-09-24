@@ -53,6 +53,7 @@ class ListingContractTests(unittest.TestCase):
             {
                 "canonical",
                 "serverVersion",
+                "registryMetadata",
                 "protocolVersions",
                 "tools",
                 "prompts",
@@ -74,7 +75,8 @@ class ListingContractTests(unittest.TestCase):
         tools = self.contract["tools"]
         prompts = self.contract["prompts"]
 
-        self.assertEqual(self.server["version"], version)
+        self.assertEqual(self.server["version"], self.contract["registryMetadata"]["version"])
+        self.assertEqual(self.contract["canonical"]["serverManifest"]["version"], version)
         self.assertIn(pin, self.readme)
         self.assertIn(f"MCP {version}", self.readme)
         self.assertIn(
@@ -85,10 +87,21 @@ class ListingContractTests(unittest.TestCase):
             self.assertIn(f"`{name}`", self.readme)
 
     def test_server_manifest_matches_the_canonical_contract(self) -> None:
-        self.assertEqual(self.server["version"], self.contract["serverVersion"])
+        metadata = self.contract["registryMetadata"]
+        self.assertEqual(self.server["version"], metadata["version"])
+        self.assertEqual(metadata["version"], "1.8.1")
+        self.assertEqual(self.contract["serverVersion"], "1.8.0")
         self.assertEqual(self.server["name"], "io.github.beepboop2025/liquilens")
         self.assertEqual(
             self.server["repository"]["url"],
+            "https://github.com/beepboop2025/liquilens-mcp",
+        )
+        self.assertEqual(self.server["repository"]["url"], metadata["repositoryUrl"])
+        self.assertEqual(self.server["websiteUrl"], "https://liquilens.in/agents/")
+        self.assertEqual(self.server["websiteUrl"], metadata["websiteUrl"])
+        self.assertEqual(self.server["description"], metadata["description"])
+        self.assertEqual(
+            self.contract["canonical"]["serverManifest"]["repository"]["url"],
             self.contract["canonical"]["repository"],
         )
         self.assertEqual(self.server["repository"]["source"], "github")
