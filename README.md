@@ -32,6 +32,18 @@ fair-use limits apply and your model provider may charge separately.
 The [free starter kit](https://liquilens.in/agents/) also includes a Python brief,
 a manual n8n funding workflow and configurations for the clients below.
 
+OpenClaw users can also install the optional research instructions from
+[ClawHub](https://clawhub.ai/beepboop2025/skills/liquilens-trading-research):
+
+```sh
+openclaw skills install @beepboop2025/liquilens-trading-research --version 1.0.0
+```
+
+Connect the MCP servers using the OpenClaw guide first. The skill supplies task
+instructions and a configuration template; installation does not configure servers
+or run research. Its [source bundle](skills/liquilens-trading-research/) is MIT-0;
+that license does not relicense source data or API responses.
+
 Claude Code:
 
     claude mcp add --transport http liquilens https://api.liquilens.in/mcp
