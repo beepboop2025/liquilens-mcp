@@ -36,7 +36,7 @@ OpenClaw users can also install the optional research instructions from
 [ClawHub](https://clawhub.ai/beepboop2025/skills/liquilens-trading-research):
 
 ```sh
-openclaw skills install @beepboop2025/liquilens-trading-research --version 1.0.0
+openclaw skills install @beepboop2025/liquilens-trading-research --version 1.0.1
 ```
 
 Connect the MCP servers using the OpenClaw guide first. The skill supplies task
