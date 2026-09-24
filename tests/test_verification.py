@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import copy
 import importlib.util
 import io
 import json
@@ -43,7 +44,7 @@ class StaticPinTests(unittest.TestCase):
 
     def test_exact_source_pin_manifest_and_import_are_required(self):
         contract = json.loads((ROOT / "contract.json").read_text())
-        manifest = json.loads((ROOT / "server.json").read_text())
+        manifest = contract["canonical"]["serverManifest"]
         with tempfile.TemporaryDirectory() as temporary:
             core = Path(temporary)
             backend = core / "backend"
@@ -74,13 +75,84 @@ class StaticPinTests(unittest.TestCase):
                 (core / "server.json").write_text(json.dumps(changed))
                 with self.assertRaisesRegex(ValueError, "core server manifest"):
                     pin.verify(core)
+                for field, value in (
+                    ("remotes", [{"type": "sse", "url": "https://api.liquilens.in/mcp"}]),
+                    ("remotes", [{"type": "streamable-http", "url": "https://other.example/mcp"}]),
+                    ("remotes", [{"type": "streamable-http", "url": "https://api.liquilens.in/mcp",
+                                  "headers": [{"name": "Authorization", "isRequired": True}]}]),
+                    ("unexpectedField", True),
+                ):
+                    with self.subTest(field=field, value=value):
+                        (core / "server.json").write_text(json.dumps(dict(manifest, **{field: value})))
+                        with self.assertRaisesRegex(ValueError, "core server manifest"):
+                            pin.verify(core)
                 (core / "server.json").write_text(json.dumps(manifest))
+                protocol_path = backend / "mcp_protocol.py"
+                protocol_source = protocol_path.read_text()
+                protocol_path.write_text(protocol_source.replace("SERVER_VERSION = '1.8.0'", "SERVER_VERSION = '1.8.1'"))
+                with self.assertRaisesRegex(ValueError, "serverVersion"):
+                    pin.verify(core)
+                protocol_path.write_text(protocol_source)
                 (backend / "mcp_server.py").write_text(server_source.replace("from mcp_bank_tools", "from unrelated"))
                 with self.assertRaisesRegex(ValueError, "must import"):
                     pin.verify(core)
             with patch.object(pin.subprocess, "check_output", return_value="0" * 40):
                 with self.assertRaisesRegex(ValueError, "listing pins"):
                     pin.verify(core)
+
+    def test_registry_metadata_has_only_finite_public_fields(self):
+        contract = json.loads((ROOT / "contract.json").read_text())
+        core = copy.deepcopy(contract["canonical"]["serverManifest"])
+        original = copy.deepcopy(core)
+        metadata = contract["registryMetadata"]
+        expected = pin._public_registry_manifest(core, metadata)
+        self.assertEqual(core, original)
+        self.assertEqual(expected, json.loads((ROOT / "server.json").read_text()))
+        for field, value in (
+            ("remotes", []),
+            ("serverVersion", "9.9.9"),
+            ("arbitraryOverride", {}),
+            ("version", "1.8.0"),
+            ("version", "01.8.1"),
+            ("version", "not-a-version"),
+            ("repositoryUrl", "https://github.com/beepboop2025/LiquiLens"),
+            ("websiteUrl", "https://other.example/"),
+        ):
+            with self.subTest(field=field, value=value), self.assertRaises(ValueError):
+                pin._public_registry_manifest(core, dict(metadata, **{field: value}))
+
+    def test_public_manifest_drift_is_rejected(self):
+        contract = json.loads((ROOT / "contract.json").read_text())
+        manifest = json.loads((ROOT / "server.json").read_text())
+        # The real verifier must reject drift in the listing even when the exact
+        # core checkout, runtime version and inventories still match their pin.
+        source = "from mcp_bank_tools import BANK_TOOLS, BANK_PROMPTS\n"
+        source += f"TOOLS = {dict.fromkeys(contract['tools'])!r}\n"
+        source += f"PROMPTS = {dict.fromkeys(contract['prompts'])!r}\n"
+        versions = contract["protocolVersions"]
+        protocol = (f"MODERN_PROTOCOL_VERSION = {versions[0]!r}\n"
+                    f"PROTOCOL_VERSION = {versions[1]!r}\n"
+                    f"LEGACY_PROTOCOL_VERSIONS = (PROTOCOL_VERSION, {versions[2]!r}, {versions[3]!r})\n"
+                    f"SERVER_VERSION = {contract['serverVersion']!r}\n")
+        def module(path):
+            return ast.parse({"mcp_server.py": source, "mcp_protocol.py": protocol,
+                              "mcp_bank_tools.py": "BANK_TOOLS = {}\nBANK_PROMPTS = {}\n"}[path.name])
+        for field, value in (
+            ("remotes", [{"type": "sse", "url": "https://api.liquilens.in/mcp"}]),
+            ("remotes", [{"type": "streamable-http", "url": "https://api.liquilens.in/mcp",
+                          "headers": [{"name": "Authorization", "isRequired": True}]}]),
+            ("unexpectedField", True),
+        ):
+            changed = dict(manifest, **{field: value})
+            def read_json(path):
+                return contract if path.name == "contract.json" else (
+                    changed if path.parent == ROOT else contract["canonical"]["serverManifest"])
+            with self.subTest(field=field, value=value), \
+                 patch.object(pin.subprocess, "check_output", return_value=contract["canonical"]["releaseCommit"]), \
+                 patch.object(pin, "_json", side_effect=read_json), \
+                 patch.object(pin, "_module", side_effect=module), \
+                 self.assertRaisesRegex(ValueError, "public registry manifest"):
+                pin.verify(Path("/synthetic-core"))
 
 
 class Response(io.BytesIO):

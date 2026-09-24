@@ -64,9 +64,11 @@ that feature is available in your workspace.
 This repository is the public discovery and documentation mirror. The hosted
 implementation is maintained in a private core repository. This public mirror pins
 its inspectable capability contract to the reviewed source revision above.
-The official Registry already serves
-[`io.github.beepboop2025/liquilens` version 1.8.0](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.beepboop2025%2Fliquilens/versions/1.8.0).
-This update reconciles the mirror with that release; it does not publish a new Registry version.
+The [official Registry entry](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.beepboop2025%2Fliquilens/versions/latest)
+uses the name `io.github.beepboop2025/liquilens`. This repository's Registry
+metadata revision 1.8.1 points to the public mirror and free starter kit.
+The hosted MCP remains version 1.8.0 with the same endpoint and capability contract;
+the metadata revision does not describe a runtime upgrade.
 
 ## Run a research task
 

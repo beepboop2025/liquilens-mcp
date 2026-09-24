@@ -5,7 +5,9 @@ from __future__ import annotations
 
 import argparse
 import ast
+import copy
 import json
+import re
 import subprocess
 from pathlib import Path
 from typing import Any
@@ -62,6 +64,36 @@ def _literal(tree: ast.Module, name: str) -> Any:
     return ast.literal_eval(_assignment(tree, name))
 
 
+def _public_registry_manifest(core: dict[str, Any],
+                              metadata: dict[str, Any]) -> dict[str, Any]:
+    """Project only the reviewed public metadata onto the exact core manifest."""
+    if set(metadata) != {"version", "repositoryUrl", "websiteUrl", "description"}:
+        raise ValueError("registryMetadata must declare exactly the four public metadata fields")
+    versions = []
+    for version in (core.get("version"), metadata["version"]):
+        if not isinstance(version, str) or not re.fullmatch(
+            r"(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)", version
+        ):
+            raise ValueError("registry and runtime versions must use numeric semantic versions")
+        versions.append(tuple(int(part) for part in version.split(".")))
+    if versions[1] <= versions[0]:
+        raise ValueError("registry metadata revision must be newer than the pinned runtime version")
+    if metadata["repositoryUrl"] != "https://github.com/beepboop2025/liquilens-mcp":
+        raise ValueError("registry repository must be the public LiquiLens mirror")
+    if metadata["websiteUrl"] != "https://liquilens.in/agents/":
+        raise ValueError("registry website must be the public agent starter kit")
+    description = metadata["description"]
+    if not isinstance(description, str) or not 1 <= len(description) <= 100:
+        raise ValueError("registry description must contain 1 to 100 characters")
+
+    expected = copy.deepcopy(core)
+    expected["version"] = metadata["version"]
+    expected["repository"]["url"] = metadata["repositoryUrl"]
+    expected["websiteUrl"] = metadata["websiteUrl"]
+    expected["description"] = description
+    return expected
+
+
 def verify(core: Path) -> None:
     contract = _json(ROOT / "contract.json")
     listing_server = _json(ROOT / "server.json")
@@ -113,7 +145,13 @@ def verify(core: Path) -> None:
             _literal(protocol_tree, "SERVER_VERSION"),
             contract["serverVersion"],
         ),
-        "core server manifest": (core_server, listing_server),
+        "core server manifest": (core_server, contract["canonical"]["serverManifest"]),
+        "public registry manifest": (
+            listing_server,
+            _public_registry_manifest(
+                contract["canonical"]["serverManifest"], contract["registryMetadata"]
+            ),
+        ),
     }
     mismatches = [
         f"{label}: core={actual!r}, listing={expected!r}"
