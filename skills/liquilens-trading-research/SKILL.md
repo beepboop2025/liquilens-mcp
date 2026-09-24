@@ -41,15 +41,29 @@ starter kit and exact configuration files are at https://liquilens.in/agents/.
 1. Establish the research question, date and explicit position size if relevant.
 2. Read Seiche `data_health` and `money_market_context(section="summary")`.
    Use `funding_stress_now` for the funding conclusion and counterevidence.
-3. If a bank is named, first discover exact LiquiLens coverage through
-   `banking_specialisation_coverage` or `universe_search`. Use
-   `bank_asset_quality_review` or `institution_review_packet` for the matched
-   identifier. Preserve jurisdiction, reporting period, units and missingness.
-   Ask for clarification on ambiguous names; never choose a similar entity.
-4. For a BTC exit-cost question, call Undertow `exit_cost` with the requested
+3. For bank filing research, call LiquiLens `banking_specialisation_coverage`
+   first. Match the requested institution to an exact returned row, then call
+   `bank_asset_quality_review(slug="<returned slug>")`. If the name is ambiguous,
+   ask the user to choose the exact institution before requesting a review.
+   If no matching row exists, report that filing coverage is missing and stop
+   that section; do not guess a slug or substitute a similar institution.
+   Preserve jurisdiction, reporting period, units and the returned `observed`,
+   `stale`, `historical`, `unavailable` or `not_covered` state. Old filings do
+   not establish current conditions.
+4. Only for a separately requested Failure Radar review, call
+   `institution_review_packet(institution="<exact full name or known Failure Radar slug>")`.
+   Its own `covered`, `not_covered` or `ambiguous` status determines that review's
+   coverage. On `ambiguous`, ask the user to select an exact returned candidate
+   before retrying. Preserve missing or stale evidence and any stale-dossier
+   exclusion. Filing coverage from step 3 does not establish Failure Radar
+   coverage, and the two reviews are not substitutes.
+5. Use `universe_search` only for a requested RBI NBFC register lookup. A
+   registry match establishes neither bank-filing nor Failure Radar coverage,
+   and is not evidence of creditworthiness.
+6. For a BTC exit-cost question, call Undertow `exit_cost` with the requested
    supported `size_usd`. Show requested size, published size rung, source time
    and basis points. Treat it as an estimate, not an executable venue quote.
-5. Return one section per product, each with source dates, URLs, relevant
+7. Return one section per product, each with source dates, URLs, relevant
    evidence, counterevidence and limitations. Keep failed sections visible.
    Do not combine independent products into an invented score.
 
