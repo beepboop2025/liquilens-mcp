@@ -65,7 +65,7 @@ class ListingContractTests(unittest.TestCase):
             names = self.contract[field]
             self.assertEqual(names, sorted(set(names)))
             self.assertTrue(all(re.fullmatch(r"[a-z][a-z0-9_]+", n) for n in names))
-        self.assertEqual(len(self.contract["tools"]), 22)
+        self.assertEqual(len(self.contract["tools"]), 23)
         self.assertEqual(len(self.contract["prompts"]), 5)
         self.assertEqual(self.contract["resourceTemplates"], [])
 
@@ -127,7 +127,7 @@ class ListingContractTests(unittest.TestCase):
         self.assertEqual(
             table_pattern.findall(prompt_section), self.contract["prompts"]
         )
-        self.assertIn("22 read-only tools and 5 guided prompts", self.readme)
+        self.assertIn("23 read-only tools and 5 guided prompts", self.readme)
 
     def test_readme_documents_versions_and_evidence_boundary(self) -> None:
         self.assertIn(f"MCP {self.contract['serverVersion']}", self.readme)

@@ -1,6 +1,6 @@
 {
   "canonical": {
-    "releaseCommit": "ca0e7a07008a29f1c881b18c622f172f82b919ef",
+    "releaseCommit": "e853bea04303d3ed24c0c3541a9af15ebae98711",
     "repository": "https://github.com/beepboop2025/LiquiLens",
     "serverManifest": {
       "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
@@ -44,6 +44,7 @@
     "failure_radar_institution",
     "forward_odds",
     "household_credit_board",
+    "institution_research_coverage",
     "institution_review_packet",
     "latest_article",
     "rbi_supervisory_tape",

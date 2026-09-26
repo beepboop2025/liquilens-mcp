@@ -7,10 +7,10 @@
 
 LiquiLens is a failure early-warning system for banks and lenders, built on public
 data with a machine-readable historical-evidence boundary served beside every claim.
-This MCP 1.8.0 endpoint exposes 22 read-only tools and 5 guided prompts so an agent
+This MCP 1.8.0 endpoint exposes 23 read-only tools and 5 guided prompts so an agent
 reads the same status, eligibility flags and cited record a human sees. Its
 capability inventory is pinned to LiquiLens commit
-`ca0e7a07008a29f1c881b18c622f172f82b919ef`.
+`e853bea04303d3ed24c0c3541a9af15ebae98711`.
 
 It now reads both ends of the chain: which institutions are fragile, and whether that
 stress is actually crossing into the real economy: companies rolling paper and drawing
@@ -67,8 +67,10 @@ its inspectable capability contract to the reviewed source revision above.
 The [official Registry entry](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.beepboop2025%2Fliquilens/versions/latest)
 uses the name `io.github.beepboop2025/liquilens`. This repository's Registry
 metadata revision 1.8.1 points to the public mirror and free starter kit.
-The hosted MCP remains version 1.8.0 with the same endpoint and capability contract;
-the metadata revision does not describe a runtime upgrade.
+The hosted MCP reports version 1.8.0 at the same endpoint. Its current capability
+contract includes `institution_research_coverage`; the pinned source and tool
+inventory above identify that addition. Registry revision 1.8.1 is a metadata
+revision, not a runtime version.
 
 ## Query source histories
 
@@ -131,6 +133,7 @@ a downloadable workflow does not imply acceptance into n8n's template library.
 | `failure_radar_institution` | One institution in depth: PD trajectory with drivers, PCA/SAF headroom history, forensic screen, market reading |
 | `forward_odds` | Counted forward stress odds for each public-signal layer, withheld until the layer has enough observed history |
 | `household_credit_board` | Is stress transmitting through household balance sheets? Fed delinquency and charge-off legs against each leg's own trailing decade, two-sided revolving-credit velocity, debt service as unscored context |
+| `institution_research_coverage` | Discover institution dossiers, registry entries and reviewed filing facts with separate observed, stale, historical, subset and registry-only states; coverage is not a rating or permission to trade |
 | `institution_review_packet` | One lender's deterministic evidence packet for human review, with coverage and freshness stated explicitly |
 | `latest_article` | Today's exact evidence-led LiquiLens article, or a labelled historical replay when the evidence did not move |
 | `rbi_supervisory_tape` | Latest RBI enforcement actions, each linking to the RBI's own page |
