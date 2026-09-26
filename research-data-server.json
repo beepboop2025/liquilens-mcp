@@ -1,0 +1,18 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.beepboop2025/financial-source-data",
+  "title": "Seiche, LiquiLens and Undertow source data",
+  "description": "Funding histories, bank filings and settlement data with source receipts, units and capture clocks.",
+  "version": "1.1.0",
+  "repository": {
+    "url": "https://github.com/beepboop2025/liquilens-mcp",
+    "source": "github"
+  },
+  "websiteUrl": "https://liquilens.in/agents/#source-data",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://api.seiche.info/api/v2/research-data/mcp"
+    }
+  ]
+}

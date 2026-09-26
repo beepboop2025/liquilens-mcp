@@ -70,6 +70,10 @@ metadata revision 1.8.1 points to the public mirror and free starter kit.
 The hosted MCP remains version 1.8.0 with the same endpoint and capability contract;
 the metadata revision does not describe a runtime upgrade.
 
+## Query source histories
+
+The separate [source-data MCP and Python client](source-data.md) expose funding histories, bank filings and Bitcoin/Liquid settlement observations with source receipts, native units and capture clocks. Use the [live coverage table](https://liquilens.in/agents/#source-data) or import its [OpenAPI contract](https://api.seiche.info/api/v2/research-data/openapi.json).
+
 ## Run a research task
 
 The [research recipes](https://liquilens.in/developers/#research-recipes) run with
