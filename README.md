@@ -174,3 +174,7 @@ serves `validated_backtest_eligible: false` and `real_money_eligible: false`.
 - [Undertow](https://liquilens-undertow.com/developers/) — the cross market liquidity map: daily tiered board, exit cost at position size, Telegram front door at [t.me/undertow_LiquiLens_bot](https://t.me/undertow_LiquiLens_bot)
 
 Product: [liquilens.in](https://liquilens.in) · Live demo: [demo.liquilens.in](https://demo.liquilens.in)
+
+## Quant research agent integrations
+
+[Native framework tools and cited quant pipeline captures](https://liquilens.in/agents/quant/) connect Seiche funding, LiquiLens bank diagnostics and Undertow market liquidity through compact read-only tables. LangChain/LangGraph, CrewAI, OpenAI Agents and Pydantic AI share one evidence contract and repeat-call revision tokens. Current published history is not an as-published vintage archive. No execution authority or institutional-adoption claim is implied.
