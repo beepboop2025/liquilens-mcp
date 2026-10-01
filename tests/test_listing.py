@@ -90,7 +90,7 @@ class ListingContractTests(unittest.TestCase):
         metadata = self.contract["registryMetadata"]
         self.assertEqual(self.server["version"], metadata["version"])
         self.assertEqual(metadata["version"], "1.8.1")
-        self.assertEqual(self.contract["serverVersion"], "1.8.0")
+        self.assertEqual(self.contract["serverVersion"], "1.8.1")
         self.assertEqual(self.server["name"], "io.github.beepboop2025/liquilens")
         self.assertEqual(
             self.server["repository"]["url"],

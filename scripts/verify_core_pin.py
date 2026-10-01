@@ -76,8 +76,8 @@ def _public_registry_manifest(core: dict[str, Any],
         ):
             raise ValueError("registry and runtime versions must use numeric semantic versions")
         versions.append(tuple(int(part) for part in version.split(".")))
-    if versions[1] <= versions[0]:
-        raise ValueError("registry metadata revision must be newer than the pinned runtime version")
+    if versions[1] < versions[0]:
+        raise ValueError("registry metadata revision must not precede the pinned runtime version")
     if metadata["repositoryUrl"] != "https://github.com/beepboop2025/liquilens-mcp":
         raise ValueError("registry repository must be the public LiquiLens mirror")
     if metadata["websiteUrl"] != "https://liquilens.in/agents/":

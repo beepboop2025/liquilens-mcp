@@ -89,7 +89,7 @@ class StaticPinTests(unittest.TestCase):
                 (core / "server.json").write_text(json.dumps(manifest))
                 protocol_path = backend / "mcp_protocol.py"
                 protocol_source = protocol_path.read_text()
-                protocol_path.write_text(protocol_source.replace("SERVER_VERSION = '1.8.0'", "SERVER_VERSION = '1.8.1'"))
+                protocol_path.write_text(protocol_source.replace(f"SERVER_VERSION = {contract['serverVersion']!r}", "SERVER_VERSION = '9.9.9'"))
                 with self.assertRaisesRegex(ValueError, "serverVersion"):
                     pin.verify(core)
                 protocol_path.write_text(protocol_source)
@@ -120,6 +120,20 @@ class StaticPinTests(unittest.TestCase):
         ):
             with self.subTest(field=field, value=value), self.assertRaises(ValueError):
                 pin._public_registry_manifest(core, dict(metadata, **{field: value}))
+
+    def test_registry_metadata_can_match_the_caught_up_runtime(self):
+        contract = json.loads((ROOT / "contract.json").read_text())
+        core = copy.deepcopy(contract["canonical"]["serverManifest"])
+        metadata = contract["registryMetadata"]
+        core["version"] = metadata["version"]
+        self.assertEqual(pin._public_registry_manifest(core, metadata)["version"],
+                         metadata["version"])
+        core["version"] = "1.8.0"
+        self.assertEqual(pin._public_registry_manifest(core, metadata)["version"],
+                         metadata["version"])
+        core["version"] = "1.8.2"
+        with self.assertRaisesRegex(ValueError, "must not precede"):
+            pin._public_registry_manifest(core, metadata)
 
     def test_public_manifest_drift_is_rejected(self):
         contract = json.loads((ROOT / "contract.json").read_text())

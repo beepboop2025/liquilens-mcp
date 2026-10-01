@@ -7,10 +7,10 @@
 
 LiquiLens is a failure early-warning system for banks and lenders, built on public
 data with a machine-readable historical-evidence boundary served beside every claim.
-This MCP 1.8.0 endpoint exposes 23 read-only tools and 5 guided prompts so an agent
+This MCP 1.8.1 endpoint exposes 23 read-only tools and 5 guided prompts so an agent
 reads the same status, eligibility flags and cited record a human sees. Its
 capability inventory is pinned to LiquiLens commit
-`e853bea04303d3ed24c0c3541a9af15ebae98711`.
+`efc4f94b0f4180ae0847bed96d32805d195d368e`.
 
 It now reads both ends of the chain: which institutions are fragile, and whether that
 stress is actually crossing into the real economy: companies rolling paper and drawing
@@ -67,10 +67,16 @@ its inspectable capability contract to the reviewed source revision above.
 The [official Registry entry](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.beepboop2025%2Fliquilens/versions/latest)
 uses the name `io.github.beepboop2025/liquilens`. This repository's Registry
 metadata revision 1.8.1 points to the public mirror and free starter kit.
-The hosted MCP reports version 1.8.0 at the same endpoint. Its current capability
-contract includes `institution_research_coverage`; the pinned source and tool
-inventory above identify that addition. Registry revision 1.8.1 is a metadata
-revision, not a runtime version.
+The hosted MCP now reports version 1.8.1 at the same endpoint. The Registry
+metadata and runtime happen to share a version number; they remain separately
+verified contracts. The pinned source and tool inventory above describe the current
+runtime. The existing Registry record continues to identify this public mirror.
+
+The current runtime separates fresh model results from reviewed filing facts:
+expired filing scores are excluded from the live board, current disclosures retain
+their official source and publication clocks, and inactive institutions remain
+identifiable in historical evidence. Its US evidence includes the June 2026 panel
+and reviewed 2026 failure notices through 25 September.
 
 ## Query source histories
 
