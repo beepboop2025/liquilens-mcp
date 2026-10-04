@@ -45,11 +45,21 @@ instructions and a configuration template; installation does not configure serve
 or run research. Its [source bundle](skills/liquilens-trading-research/) is MIT-0;
 that license does not relicense source data or API responses.
 
-Checked on 5 October 2026: version 1.1.0 is public with a clean ClawHub security
-scan. Its isolated Linux install recorded the correct version and matched all
-three reviewed source files. Full ClawHub verification remains incomplete because
-its generated Skill Card is missing (`card.missing`); an isolated macOS install
-timed out without installed files. No model or research tool ran in these checks.
+Checked on 4 October 2026 (UTC): version 1.1.0 is public and ClawHub's
+[version-pinned verification result](https://clawhub.ai/api/v1/skills/liquilens-trading-research/verify?ownerHandle=beepboop2025&version=1.1.0)
+reports a passed security check with a benign, high-confidence verdict.
+Its embedded detailed scanner report retains
+seven findings, including medium external-transmission flags for the public MCP
+URLs, and reports partial analysis. Review the [versioned security audit](https://clawhub.ai/beepboop2025/skills/liquilens-trading-research/security-audit?version=1.1.0)
+before installation and use public research inputs.
+Its isolated Linux install recorded the correct version and matched all
+three reviewed source files. ClawHub's public verifier and the installed Linux
+client's version-pinned `openclaw skills verify` now both report `pass`, with the
+generated Skill Card present. The upload is unsigned and has no server-resolved
+GitHub import provenance. A fresh isolated macOS install after storage recovery
+also matched all three source-file hashes, and its version-pinned verification
+reports `pass`. The earlier macOS timeout remains a separate failed attempt.
+No model or research tool ran in these checks.
 The direct MCP configuration is available independently of the ClawHub skill.
 
 Claude Code:
