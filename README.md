@@ -24,10 +24,11 @@ For Hermes and OpenClaw, use the native setup guides:
 - [Hermes: configuration, connection checks and a first research task](https://liquilens.in/agents/hermes/)
 - [OpenClaw: configuration, discovery checks and a first research task](https://liquilens.in/agents/openclaw/)
 
-The guides select nine research tools across LiquiLens and its Seiche funding
-and Undertow market-depth companions. They record the tested client versions and
-the exact verification scope. Public research requires no account or API key;
-fair-use limits apply and your model provider may charge separately.
+The current guides select thirteen research tools across LiquiLens, Seiche and
+Undertow, including GIFT City, reference FX and gold scenarios. Their dated
+native-client receipts retain the original nine-tool selection and exact
+verification scope. Public research requires no account or API key; fair-use
+limits apply and your model provider may charge separately.
 
 The [free starter kit](https://liquilens.in/agents/) also includes a Python brief,
 a manual n8n funding workflow and configurations for the clients below.
@@ -36,13 +37,20 @@ OpenClaw users can also install the optional research instructions from
 [ClawHub](https://clawhub.ai/beepboop2025/skills/liquilens-trading-research):
 
 ```sh
-openclaw skills install @beepboop2025/liquilens-trading-research --version 1.0.1
+openclaw skills install @beepboop2025/liquilens-trading-research --version 1.1.0
 ```
 
 Connect the MCP servers using the OpenClaw guide first. The skill supplies task
 instructions and a configuration template; installation does not configure servers
 or run research. Its [source bundle](skills/liquilens-trading-research/) is MIT-0;
 that license does not relicense source data or API responses.
+
+Checked on 5 October 2026: version 1.1.0 is public with a clean ClawHub security
+scan. Its isolated Linux install recorded the correct version and matched all
+three reviewed source files. Full ClawHub verification remains incomplete because
+its generated Skill Card is missing (`card.missing`); an isolated macOS install
+timed out without installed files. No model or research tool ran in these checks.
+The direct MCP configuration is available independently of the ClawHub skill.
 
 Claude Code:
 
