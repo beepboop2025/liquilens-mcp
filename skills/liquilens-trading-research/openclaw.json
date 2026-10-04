@@ -8,7 +8,10 @@
           "include": [
             "data_health",
             "funding_stress_now",
-            "money_market_context"
+            "money_market_context",
+            "market_workbench",
+            "gift_city_context",
+            "gold_inventory_carry"
           ]
         }
       },
@@ -30,7 +33,8 @@
         "toolFilter": {
           "include": [
             "exit_cost",
-            "venue_concentration"
+            "venue_concentration",
+            "gold_cash_realisation"
           ]
         }
       }
