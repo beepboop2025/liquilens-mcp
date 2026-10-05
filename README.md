@@ -2,6 +2,17 @@
 
 **Endpoint:** `https://api.liquilens.in/mcp` (streamable HTTP, no auth, no install)
 
+LiquiLens is the institution-evidence product of **LIQUILENS PRIVATE LIMITED**,
+a registered company in India (CIN **U62011RJ2026PTC116792**). One company, three
+connected products: LiquiLens investigates institutions, Seiche explains funding
+conditions, and Undertow examines market liquidity. People and AI agents can
+follow an exposure across all three while retaining each product's source dates,
+coverage gaps and research limits. International access does not imply universal
+market coverage or a shared score.
+
+Read the [company and investor story](https://liquilens.in/investors/) and the
+[shared company profile](https://liquilens.in/company-profile.json).
+
 **Try it live:** [liquilens.in/developers](https://liquilens.in/developers/) ·
 **REST catalog:** [api.liquilens.in/api](https://api.liquilens.in/api)
 
@@ -10,7 +21,7 @@ data with a machine-readable historical-evidence boundary served beside every cl
 This MCP 1.8.1 endpoint exposes 23 read-only tools and 5 guided prompts so an agent
 reads the same status, eligibility flags and cited record a human sees. Its
 capability inventory is pinned to LiquiLens commit
-`efc4f94b0f4180ae0847bed96d32805d195d368e`.
+`d6f99bdf2de14e8ef2f29032cf9561ca8a446de8`.
 
 It now reads both ends of the chain: which institutions are fragile, and whether that
 stress is actually crossing into the real economy: companies rolling paper and drawing
