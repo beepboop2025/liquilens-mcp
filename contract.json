@@ -1,6 +1,6 @@
 {
   "canonical": {
-    "releaseCommit": "efc4f94b0f4180ae0847bed96d32805d195d368e",
+    "releaseCommit": "d6f99bdf2de14e8ef2f29032cf9561ca8a446de8",
     "repository": "https://github.com/beepboop2025/LiquiLens",
     "serverManifest": {
       "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
