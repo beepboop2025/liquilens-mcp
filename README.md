@@ -1,5 +1,27 @@
 # LiquiLens MCP — the Failure Radar as agent tools
 
+## Connect and ask one question
+
+Hosted Streamable HTTP MCP; no local server or API key for public read-only tools.
+Add the products you need to Claude Code:
+
+```sh
+claude mcp add --transport http liquilens https://api.liquilens.in/mcp
+claude mcp add --transport http seiche https://api.seiche.info/mcp
+claude mcp add --transport http undertow https://api.seiche.info/undertow/mcp
+```
+
+**Try this first:** What changed in ESAF Small Finance Bank's NPAs? Cite the filing, reporting period and missing disclosures.
+
+[Try it in your browser](https://liquilens.in/start/?task=bank) ·
+[Cursor configuration](https://liquilens.in/agents/cursor.json) ·
+[Codex commands](https://liquilens.in/agents/codex.txt) ·
+[Free three-product starter kit and skill](https://liquilens.in/agents/#connect)
+
+For a connected review, ask for institution evidence → funding context → BTC
+exit estimates, with each source date, coverage gap and limitation kept separate.
+Client/model costs and fair-use limits may apply. Research calls do not execute trades.
+
 **Endpoint:** `https://api.liquilens.in/mcp` (streamable HTTP, no auth, no install)
 
 LiquiLens is the institution-evidence product of **LIQUILENS PRIVATE LIMITED**,
@@ -18,10 +40,11 @@ Read the [company and investor story](https://liquilens.in/investors/) and the
 
 LiquiLens is a failure early-warning system for banks and lenders, built on public
 data with a machine-readable historical-evidence boundary served beside every claim.
-This MCP 1.8.1 endpoint exposes 23 read-only tools and 5 guided prompts so an agent
-reads the same status, eligibility flags and cited record a human sees. Its
-capability inventory is pinned to LiquiLens commit
-`d6f99bdf2de14e8ef2f29032cf9561ca8a446de8`.
+Anonymous discovery on 11 October 2026 returned MCP 1.8.1 with 24 read-only tools
+and 5 guided prompts, so an agent
+reads the same status, eligibility flags and cited record a human sees. The repository
+contract retains its separately pinned source; discover the hosted endpoint for
+the current public inventory, including `institution_evidence_monitor`.
 
 It now reads both ends of the chain: which institutions are fragile, and whether that
 stress is actually crossing into the real economy: companies rolling paper and drawing
