@@ -43,8 +43,10 @@ data with a machine-readable historical-evidence boundary served beside every cl
 Anonymous discovery on 11 October 2026 returned MCP 1.8.1 with 24 read-only tools
 and 5 guided prompts, so an agent
 reads the same status, eligibility flags and cited record a human sees. The repository
-contract retains its separately pinned source; discover the hosted endpoint for
-the current public inventory, including `institution_evidence_monitor`.
+contract separately pins MCP 1.8.1 at
+`d6f99bdf2de14e8ef2f29032cf9561ca8a446de8`, with 23 read-only tools and 5 guided prompts.
+The capability tables below describe that pinned source. Discover the hosted
+endpoint for the current public inventory, including `institution_evidence_monitor`.
 
 It now reads both ends of the chain: which institutions are fragile, and whether that
 stress is actually crossing into the real economy: companies rolling paper and drawing
@@ -232,6 +234,14 @@ serves `validated_backtest_eligible: false` and `real_money_eligible: false`.
 - [Undertow](https://liquilens-undertow.com/developers/) — the cross market liquidity map: daily tiered board, exit cost at position size, Telegram front door at [t.me/undertow_LiquiLens_bot](https://t.me/undertow_LiquiLens_bot)
 
 Product: [liquilens.in](https://liquilens.in) · Live demo: [demo.liquilens.in](https://demo.liquilens.in)
+
+## Directory listing
+
+[![AllMCPs listing](https://allmcps.com/api/badge/liquilens-the-failure-radar)](https://allmcps.com/mcp/liquilens-the-failure-radar?verify=2089e298-cdac-4926-8727-66e710e1c1fe)
+
+This account-linked marker supports ownership review of the existing directory
+record. Directory badges and cached tool counts are separate from the live MCP
+contract and its evidence limits.
 
 ## Quant research agent integrations
 
