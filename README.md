@@ -120,11 +120,12 @@ implementation is maintained in a private core repository. This public mirror pi
 its inspectable capability contract to the reviewed source revision above.
 The [official Registry entry](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.beepboop2025%2Fliquilens/versions/latest)
 uses the name `io.github.beepboop2025/liquilens`. This repository's Registry
-metadata revision 1.8.1 points to the public mirror and free starter kit.
-The hosted MCP now reports version 1.8.1 at the same endpoint. The Registry
-metadata and runtime happen to share a version number; they remain separately
-verified contracts. The pinned source and tool inventory above describe the current
-runtime. The existing Registry record continues to identify this public mirror.
+metadata revision 1.8.2 points to the public mirror and free starter kit, with
+the plain title and the LiquiLens mark. The hosted MCP reports version 1.8.1 at
+the same endpoint: 1.8.2 is a metadata only revision ahead of the runtime, not a
+new server release. They remain separately verified contracts. The pinned source
+and tool inventory above describe the current runtime. The Registry record
+continues to identify this public mirror.
 
 The current runtime separates fresh model results from reviewed filing facts:
 expired filing scores are excluded from the live board, current disclosures retain

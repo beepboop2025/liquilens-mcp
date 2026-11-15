@@ -208,12 +208,16 @@ class StaticPinTests(unittest.TestCase):
         core["version"] = metadata["version"]
         self.assertEqual(pin._public_registry_manifest(core, metadata)["version"],
                          metadata["version"])
-        core["version"] = "1.8.0"
-        self.assertEqual(pin._public_registry_manifest(core, metadata)["version"],
-                         metadata["version"])
-        core["version"] = "1.8.2"
-        with self.assertRaisesRegex(ValueError, "must not precede"):
-            pin._public_registry_manifest(core, metadata)
+        # The 1.8.2 metadata revision may lead the 1.8.1 runtime it describes ...
+        for runtime in ("1.8.1", "1.8.0"):
+            core["version"] = runtime
+            self.assertEqual(pin._public_registry_manifest(core, metadata)["version"],
+                             metadata["version"])
+        # ... but never trail a newer runtime.
+        for runtime in ("1.8.3", "1.9.0", "2.0.0"):
+            core["version"] = runtime
+            with self.subTest(runtime=runtime), self.assertRaisesRegex(ValueError, "must not precede"):
+                pin._public_registry_manifest(core, metadata)
 
     def test_public_manifest_drift_is_rejected(self):
         contract = json.loads((ROOT / "contract.json").read_text())

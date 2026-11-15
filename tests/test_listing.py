@@ -96,7 +96,8 @@ class ListingContractTests(unittest.TestCase):
     def test_server_manifest_matches_the_canonical_contract(self) -> None:
         metadata = self.contract["registryMetadata"]
         self.assertEqual(self.server["version"], metadata["version"])
-        self.assertEqual(metadata["version"], "1.8.1")
+        # 1.8.2 is a Registry metadata revision (title, icon) of the 1.8.1 runtime.
+        self.assertEqual(metadata["version"], "1.8.2")
         self.assertEqual(self.contract["serverVersion"], "1.8.1")
         self.assertEqual(self.server["name"], "io.github.beepboop2025/liquilens")
         self.assertEqual(
@@ -127,6 +128,25 @@ class ListingContractTests(unittest.TestCase):
             parsed = urlparse(self.server[key])
             self.assertEqual(parsed.scheme, "https")
             self.assertTrue(parsed.netloc)
+
+    def test_readme_states_the_registry_revision_against_the_runtime(self) -> None:
+        # A Registry card may lead the hosted server's own version only as a
+        # metadata revision, and the README (the server page on GitHub's MCP
+        # Registry and in VS Code) must say so in words.
+        registry = self.contract["registryMetadata"]["version"]
+        runtime = self.contract["serverVersion"]
+        as_tuple = lambda version: tuple(int(part) for part in version.split("."))
+        self.assertGreaterEqual(as_tuple(registry), as_tuple(runtime))
+        normalized = " ".join(self.readme.split())
+        self.assertIn(f"Registry metadata revision {registry} points to", normalized)
+        self.assertIn(f"The hosted MCP reports version {runtime} at", normalized)
+        if registry != runtime:
+            self.assertIn(
+                f"{registry} is a metadata only revision ahead of the runtime, "
+                "not a new server release",
+                normalized,
+            )
+        self.assertNotIn("happen to share a version number", normalized)
 
     def test_readme_advertises_every_capability_exactly_once(self) -> None:
         tool_section = _section(self.readme, "## Tools", "## Prompts")
