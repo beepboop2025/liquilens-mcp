@@ -62,9 +62,19 @@
   ],
   "resourceTemplates": [],
   "registryMetadata": {
-    "version": "1.8.1",
+    "version": "1.8.2",
     "repositoryUrl": "https://github.com/beepboop2025/liquilens-mcp",
     "websiteUrl": "https://liquilens.in/agents/",
-    "description": "Free bank-filing and counterparty research; cited evidence limits; public MCP needs no API key."
+    "description": "Free bank-filing and counterparty research; cited evidence limits; public MCP needs no API key.",
+    "title": "LiquiLens Failure Radar",
+    "icons": [
+      {
+        "src": "https://liquilens.in/brand/liquilens-mark-512.png",
+        "mimeType": "image/png",
+        "sizes": [
+          "512x512"
+        ]
+      }
+    ]
   }
 }

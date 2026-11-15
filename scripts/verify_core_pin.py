@@ -9,11 +9,27 @@ import copy
 import json
 import re
 import subprocess
+import unicodedata
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 
 ROOT = Path(__file__).resolve().parents[1]
+PUBLIC_METADATA_FIELDS = frozenset({
+    "version", "repositoryUrl", "websiteUrl", "description", "title", "icons",
+})
+# Icons must come from the product's own domain (the registry schema asks
+# consumers to prefer the server's domain) and be raster images: an SVG can
+# carry script, so every client would need its own sanitiser.
+ICON_HOST = "liquilens.in"
+ICON_SUFFIXES = {
+    "image/png": (".png",),
+    "image/jpeg": (".jpg", ".jpeg"),
+    "image/webp": (".webp",),
+}
+ICON_SIZE = re.compile(r"[1-9][0-9]{0,4}x[1-9][0-9]{0,4}")
+ICON_FIELDS = frozenset({"src", "mimeType", "sizes", "theme"})
 
 
 def _json(path: Path) -> dict[str, Any]:
@@ -64,11 +80,62 @@ def _literal(tree: ast.Module, name: str) -> Any:
     return ast.literal_eval(_assignment(tree, name))
 
 
+def _dash_punctuation(text: str) -> list[str]:
+    """Return Unicode dash punctuation other than the ASCII hyphen-minus."""
+    return sorted({f"U+{ord(char):04X}" for char in text
+                   if char != "-" and unicodedata.category(char) == "Pd"})
+
+
+def _display_text(label: str, value: Any) -> str:
+    """Registry display copy: 1 to 100 characters, one line, no dash punctuation."""
+    if not isinstance(value, str) or not 1 <= len(value) <= 100:
+        raise ValueError(f"registry {label} must contain 1 to 100 characters")
+    if value != value.strip() or any(char in value for char in "\r\n\t"):
+        raise ValueError(f"registry {label} must be one trimmed line")
+    dashes = _dash_punctuation(value)
+    if dashes:
+        raise ValueError(f"registry {label} contains dash punctuation {', '.join(dashes)}")
+    return value
+
+
+def _icons(value: Any) -> list[dict[str, Any]]:
+    """Accept only first-party raster icons with declared type and pixel sizes."""
+    if not isinstance(value, list) or not 1 <= len(value) <= 4:
+        raise ValueError("registry icons must be a list of 1 to 4 icons")
+    icons = []
+    for icon in value:
+        if (not isinstance(icon, dict)
+                or not {"src", "mimeType", "sizes"} <= set(icon) <= ICON_FIELDS):
+            raise ValueError("each registry icon declares src, mimeType and sizes, "
+                             "and optionally theme")
+        src, mime_type, sizes = icon["src"], icon["mimeType"], icon["sizes"]
+        parsed = urlparse(src) if isinstance(src, str) else None
+        if (parsed is None or len(src) > 255 or parsed.scheme != "https"
+                or parsed.netloc != ICON_HOST or not parsed.path.startswith("/")
+                or parsed.params or parsed.query or parsed.fragment):
+            raise ValueError(f"registry icon src must be an https URL on {ICON_HOST}, "
+                             "at most 255 characters, without query or fragment")
+        if (mime_type not in ICON_SUFFIXES
+                or not parsed.path.lower().endswith(ICON_SUFFIXES[mime_type])):
+            raise ValueError("registry icon mimeType must be a raster type matching "
+                             "the file extension")
+        if (not isinstance(sizes, list) or not sizes or len(sizes) != len(set(sizes))
+                or not all(isinstance(size, str) and ICON_SIZE.fullmatch(size)
+                           for size in sizes)):
+            raise ValueError("registry icon sizes must list distinct WIDTHxHEIGHT values")
+        if "theme" in icon and icon["theme"] not in {"light", "dark"}:
+            raise ValueError("registry icon theme must be light or dark")
+        icons.append(copy.deepcopy(icon))
+    if len({icon["src"] for icon in icons}) != len(icons):
+        raise ValueError("registry icons must not repeat a source")
+    return icons
+
+
 def _public_registry_manifest(core: dict[str, Any],
                               metadata: dict[str, Any]) -> dict[str, Any]:
     """Project only the reviewed public metadata onto the exact core manifest."""
-    if set(metadata) != {"version", "repositoryUrl", "websiteUrl", "description"}:
-        raise ValueError("registryMetadata must declare exactly the four public metadata fields")
+    if set(metadata) != PUBLIC_METADATA_FIELDS:
+        raise ValueError("registryMetadata must declare exactly the six public metadata fields")
     versions = []
     for version in (core.get("version"), metadata["version"]):
         if not isinstance(version, str) or not re.fullmatch(
@@ -82,15 +149,17 @@ def _public_registry_manifest(core: dict[str, Any],
         raise ValueError("registry repository must be the public LiquiLens mirror")
     if metadata["websiteUrl"] != "https://liquilens.in/agents/":
         raise ValueError("registry website must be the public agent starter kit")
-    description = metadata["description"]
-    if not isinstance(description, str) or not 1 <= len(description) <= 100:
-        raise ValueError("registry description must contain 1 to 100 characters")
+    description = _display_text("description", metadata["description"])
+    title = _display_text("title", metadata["title"])
+    icons = _icons(metadata["icons"])
 
     expected = copy.deepcopy(core)
     expected["version"] = metadata["version"]
     expected["repository"]["url"] = metadata["repositoryUrl"]
     expected["websiteUrl"] = metadata["websiteUrl"]
     expected["description"] = description
+    expected["title"] = title
+    expected["icons"] = icons
     return expected
 
 

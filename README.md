@@ -1,4 +1,4 @@
-# LiquiLens MCP — the Failure Radar as agent tools
+# LiquiLens MCP: the Failure Radar as agent tools
 
 ## Connect and ask one question
 
@@ -120,11 +120,12 @@ implementation is maintained in a private core repository. This public mirror pi
 its inspectable capability contract to the reviewed source revision above.
 The [official Registry entry](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.beepboop2025%2Fliquilens/versions/latest)
 uses the name `io.github.beepboop2025/liquilens`. This repository's Registry
-metadata revision 1.8.1 points to the public mirror and free starter kit.
-The hosted MCP now reports version 1.8.1 at the same endpoint. The Registry
-metadata and runtime happen to share a version number; they remain separately
-verified contracts. The pinned source and tool inventory above describe the current
-runtime. The existing Registry record continues to identify this public mirror.
+metadata revision 1.8.2 points to the public mirror and free starter kit, with
+the plain title and the LiquiLens mark. The hosted MCP reports version 1.8.1 at
+the same endpoint: 1.8.2 is a metadata only revision ahead of the runtime, not a
+new server release. They remain separately verified contracts. The pinned source
+and tool inventory above describe the current runtime. The Registry record
+continues to identify this public mirror.
 
 The current runtime separates fresh model results from reviewed filing facts:
 expired filing scores are excluded from the live board, current disclosures retain
@@ -218,7 +219,7 @@ The generative layer explains; **deterministic screening policy scores.** Histor
 diagnostics retain their served evidence status and eligibility flags and do not become
 validated-backtest or real-money evidence merely because a deterministic engine produced
 them. Screens, not ratings; not investment advice. Institutions without a vetted dossier
-are absent by design — the tools say so rather than inventing a score.
+are absent by design: the tools say so rather than inventing a score.
 
 The three historical status tokens are part of the API contract, not marketing copy:
 `PERIOD_END_PROXY_CONSTRUCTION_PIT` for India,
@@ -228,10 +229,10 @@ serves `validated_backtest_eligible: false` and `real_money_eligible: false`.
 
 ## Siblings from the same lab
 
-- [Seiche](https://api.seiche.info/mcp) — US money-market funding stress (the plumbing)
-- [groundcheck](https://groundcheck.seiche.info) — claim grounding and citation verification
-- Palimpsest (`https://api.seiche.info/palimpsest/mcp`) — live internet-censorship signals
-- [Undertow](https://liquilens-undertow.com/developers/) — the cross market liquidity map: daily tiered board, exit cost at position size, Telegram front door at [t.me/undertow_LiquiLens_bot](https://t.me/undertow_LiquiLens_bot)
+- [Seiche](https://api.seiche.info/mcp): US money-market funding stress (the plumbing)
+- [groundcheck](https://groundcheck.seiche.info): claim grounding and citation verification
+- Palimpsest (`https://api.seiche.info/palimpsest/mcp`): live internet-censorship signals
+- [Undertow](https://liquilens-undertow.com/developers/): the cross market liquidity map, daily tiered board, exit cost at position size, Telegram front door at [t.me/undertow_LiquiLens_bot](https://t.me/undertow_LiquiLens_bot)
 
 Product: [liquilens.in](https://liquilens.in) · Live demo: [demo.liquilens.in](https://demo.liquilens.in)
 
@@ -246,3 +247,10 @@ contract and its evidence limits.
 ## Quant research agent integrations
 
 [Native framework tools and cited quant pipeline captures](https://liquilens.in/agents/quant/) connect Seiche funding, LiquiLens bank diagnostics and Undertow market liquidity through compact read-only tables. LangChain/LangGraph, CrewAI, OpenAI Agents and Pydantic AI share one evidence contract and repeat-call revision tokens. Current published history is not an as-published vintage archive. No execution authority or institutional-adoption claim is implied.
+
+## License
+
+The manifests, documentation, scripts and tests in this repository are released
+under the [MIT License](LICENSE); the client skill keeps its MIT No Attribution
+license. The hosted service and its data are governed by separate terms: see
+[NOTICE.md](NOTICE.md).

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+import unicodedata
 import unittest
 from pathlib import Path
 from typing import Any
@@ -9,6 +10,12 @@ from urllib.parse import urlparse
 
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def _dash_punctuation(text: str) -> list[str]:
+    """Unicode dash punctuation other than the ASCII hyphen-minus."""
+    return sorted({f"U+{ord(char):04X}" for char in text
+                   if char != "-" and unicodedata.category(char) == "Pd"})
 
 
 def _strict_json(path: Path) -> dict[str, Any]:
@@ -89,7 +96,8 @@ class ListingContractTests(unittest.TestCase):
     def test_server_manifest_matches_the_canonical_contract(self) -> None:
         metadata = self.contract["registryMetadata"]
         self.assertEqual(self.server["version"], metadata["version"])
-        self.assertEqual(metadata["version"], "1.8.1")
+        # 1.8.2 is a Registry metadata revision (title, icon) of the 1.8.1 runtime.
+        self.assertEqual(metadata["version"], "1.8.2")
         self.assertEqual(self.contract["serverVersion"], "1.8.1")
         self.assertEqual(self.server["name"], "io.github.beepboop2025/liquilens")
         self.assertEqual(
@@ -104,6 +112,8 @@ class ListingContractTests(unittest.TestCase):
             self.contract["canonical"]["serverManifest"]["repository"]["url"],
             self.contract["canonical"]["repository"],
         )
+        self.assertEqual(self.server["title"], metadata["title"])
+        self.assertEqual(self.server["icons"], metadata["icons"])
         self.assertEqual(self.server["repository"]["source"], "github")
         self.assertLessEqual(len(self.server["description"]), 100)
         self.assertEqual(
@@ -118,6 +128,25 @@ class ListingContractTests(unittest.TestCase):
             parsed = urlparse(self.server[key])
             self.assertEqual(parsed.scheme, "https")
             self.assertTrue(parsed.netloc)
+
+    def test_readme_states_the_registry_revision_against_the_runtime(self) -> None:
+        # A Registry card may lead the hosted server's own version only as a
+        # metadata revision, and the README (the server page on GitHub's MCP
+        # Registry and in VS Code) must say so in words.
+        registry = self.contract["registryMetadata"]["version"]
+        runtime = self.contract["serverVersion"]
+        as_tuple = lambda version: tuple(int(part) for part in version.split("."))
+        self.assertGreaterEqual(as_tuple(registry), as_tuple(runtime))
+        normalized = " ".join(self.readme.split())
+        self.assertIn(f"Registry metadata revision {registry} points to", normalized)
+        self.assertIn(f"The hosted MCP reports version {runtime} at", normalized)
+        if registry != runtime:
+            self.assertIn(
+                f"{registry} is a metadata only revision ahead of the runtime, "
+                "not a new server release",
+                normalized,
+            )
+        self.assertNotIn("happen to share a version number", normalized)
 
     def test_readme_advertises_every_capability_exactly_once(self) -> None:
         tool_section = _section(self.readme, "## Tools", "## Prompts")
@@ -142,6 +171,51 @@ class ListingContractTests(unittest.TestCase):
         ):
             self.assertIn(token, self.readme)
         self.assertNotIn("MCP 1.5.0", self.readme)
+
+    def test_registry_display_metadata_is_plain_and_first_party(self) -> None:
+        # The hosted server answers initialize with this title (read 15 Nov 2026);
+        # the registry card and the server should name the product the same way.
+        self.assertEqual(self.server["title"], "LiquiLens Failure Radar")
+        research = _strict_json(ROOT / "research-data-server.json")
+        for label, text in (
+            ("server title", self.server["title"]),
+            ("server description", self.server["description"]),
+            ("research title", research["title"]),
+            ("research description", research["description"]),
+        ):
+            with self.subTest(field=label):
+                self.assertEqual(_dash_punctuation(text), [], text)
+        self.assertEqual(
+            self.server["icons"],
+            [{
+                "src": "https://liquilens.in/brand/liquilens-mark-512.png",
+                "mimeType": "image/png",
+                "sizes": ["512x512"],
+            }],
+        )
+
+    def test_shipped_listing_text_has_no_dash_punctuation(self) -> None:
+        # GitHub's MCP Registry and VS Code show this repository's README as the
+        # server page, so the listing text follows the no em or en dash rule.
+        paths = sorted(
+            {*ROOT.glob("*.md"), *ROOT.glob("skills/**/*.md")},
+            key=lambda path: path.as_posix(),
+        )
+        self.assertIn(ROOT / "README.md", paths)
+        for path in paths:
+            with self.subTest(path=path.relative_to(ROOT).as_posix()):
+                self.assertEqual(
+                    _dash_punctuation(path.read_text(encoding="utf-8")), []
+                )
+
+    def test_license_scope_is_published_with_the_listing(self) -> None:
+        license_text = (ROOT / "LICENSE").read_text(encoding="utf-8")
+        notice = " ".join((ROOT / "NOTICE.md").read_text(encoding="utf-8").split())
+        self.assertTrue(license_text.startswith("MIT License\n"))
+        self.assertIn("https://liquilens.in/terms/", notice)
+        self.assertIn("https://api.liquilens.in/mcp", notice)
+        self.assertIn("MIT No Attribution", notice)
+        self.assertIn("[NOTICE.md](NOTICE.md)", self.readme)
 
     def test_secondary_registry_metadata_is_minimal(self) -> None:
         self.assertEqual(

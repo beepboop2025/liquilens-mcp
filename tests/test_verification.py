@@ -120,6 +120,86 @@ class StaticPinTests(unittest.TestCase):
         ):
             with self.subTest(field=field, value=value), self.assertRaises(ValueError):
                 pin._public_registry_manifest(core, dict(metadata, **{field: value}))
+        for field in ("title", "icons"):
+            reduced = {key: value for key, value in metadata.items() if key != field}
+            with self.subTest(missing=field), self.assertRaisesRegex(ValueError, "six public"):
+                pin._public_registry_manifest(core, reduced)
+
+    def test_registry_display_copy_rejects_dash_punctuation(self):
+        contract = json.loads((ROOT / "contract.json").read_text())
+        core = contract["canonical"]["serverManifest"]
+        metadata = contract["registryMetadata"]
+        # The pinned core still carries the old em dash title; the projection
+        # replaces it, so the published card never inherits it.
+        self.assertIn("—", core["title"])
+        self.assertEqual(pin._public_registry_manifest(core, metadata)["title"],
+                         "LiquiLens Failure Radar")
+        for field, value in (
+            ("title", "LiquiLens — the Failure Radar"),
+            ("title", "LiquiLens – Failure Radar"),
+            ("title", "LiquiLens ― Failure Radar"),
+            ("title", "LiquiLens ‑ Failure Radar"),
+            ("title", ""),
+            ("title", " LiquiLens Failure Radar"),
+            ("title", "LiquiLens\nFailure Radar"),
+            ("title", "L" * 101),
+            ("title", None),
+            ("description", "Free bank research — cited evidence limits."),
+        ):
+            with self.subTest(field=field, value=value), self.assertRaises(ValueError):
+                pin._public_registry_manifest(core, dict(metadata, **{field: value}))
+        hyphenated = dict(metadata, title="LiquiLens Failure-Radar")
+        self.assertEqual(pin._public_registry_manifest(core, hyphenated)["title"],
+                         "LiquiLens Failure-Radar")
+
+    def test_registry_icons_are_first_party_typed_raster_images(self):
+        contract = json.loads((ROOT / "contract.json").read_text())
+        core = contract["canonical"]["serverManifest"]
+        metadata = contract["registryMetadata"]
+        icon = metadata["icons"][0]
+        bad_icons = (
+            None,
+            [],
+            icon,
+            [icon] * 5,
+            [icon, dict(icon)],
+            [dict(icon, src="http://liquilens.in/brand/liquilens-mark-512.png")],
+            [dict(icon, src="https://other.example/brand/liquilens-mark-512.png")],
+            [dict(icon, src="https://www.liquilens.in/brand/liquilens-mark-512.png")],
+            [dict(icon, src="https://liquilens.in:8443/brand/liquilens-mark-512.png")],
+            [dict(icon, src="https://user@liquilens.in/brand/liquilens-mark-512.png")],
+            [dict(icon, src="https://liquilens.in/brand/liquilens-mark-512.png?v=2")],
+            [dict(icon, src="https://liquilens.in/brand/liquilens-mark-512.png#mark")],
+            [dict(icon, src="https://liquilens.in/" + "a" * 240 + ".png")],
+            [dict(icon, src=None)],
+            [dict(icon, mimeType="image/svg+xml", src="https://liquilens.in/brand/mark.svg",
+                  sizes=["any"])],
+            [dict(icon, mimeType="image/jpeg")],
+            [dict(icon, mimeType=None)],
+            [dict(icon, sizes=[])],
+            [dict(icon, sizes="512x512")],
+            [dict(icon, sizes=["512"])],
+            [dict(icon, sizes=["0x512"])],
+            [dict(icon, sizes=["any"])],
+            [dict(icon, sizes=["512x512", "512x512"])],
+            [dict(icon, theme="sepia")],
+            [dict(icon, extra=True)],
+            [{key: value for key, value in icon.items() if key != "sizes"}],
+            [{key: value for key, value in icon.items() if key != "mimeType"}],
+        )
+        for value in bad_icons:
+            with self.subTest(icons=value), self.assertRaises(ValueError):
+                pin._public_registry_manifest(core, dict(metadata, icons=value))
+        for value in (
+            [dict(icon, theme="light")],
+            [dict(icon, sizes=["512x512", "256x256"])],
+            [icon, dict(icon, src="https://liquilens.in/brand/liquilens-mark-192.webp",
+                        mimeType="image/webp", sizes=["192x192"], theme="dark")],
+        ):
+            with self.subTest(accepted=value):
+                projected = pin._public_registry_manifest(core, dict(metadata, icons=value))
+                self.assertEqual(projected["icons"], value)
+                self.assertIsNot(projected["icons"][0], value[0])
 
     def test_registry_metadata_can_match_the_caught_up_runtime(self):
         contract = json.loads((ROOT / "contract.json").read_text())
@@ -128,12 +208,16 @@ class StaticPinTests(unittest.TestCase):
         core["version"] = metadata["version"]
         self.assertEqual(pin._public_registry_manifest(core, metadata)["version"],
                          metadata["version"])
-        core["version"] = "1.8.0"
-        self.assertEqual(pin._public_registry_manifest(core, metadata)["version"],
-                         metadata["version"])
-        core["version"] = "1.8.2"
-        with self.assertRaisesRegex(ValueError, "must not precede"):
-            pin._public_registry_manifest(core, metadata)
+        # The 1.8.2 metadata revision may lead the 1.8.1 runtime it describes ...
+        for runtime in ("1.8.1", "1.8.0"):
+            core["version"] = runtime
+            self.assertEqual(pin._public_registry_manifest(core, metadata)["version"],
+                             metadata["version"])
+        # ... but never trail a newer runtime.
+        for runtime in ("1.8.3", "1.9.0", "2.0.0"):
+            core["version"] = runtime
+            with self.subTest(runtime=runtime), self.assertRaisesRegex(ValueError, "must not precede"):
+                pin._public_registry_manifest(core, metadata)
 
     def test_public_manifest_drift_is_rejected(self):
         contract = json.loads((ROOT / "contract.json").read_text())
