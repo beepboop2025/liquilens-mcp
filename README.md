@@ -1,4 +1,4 @@
-# LiquiLens MCP — the Failure Radar as agent tools
+# LiquiLens MCP: the Failure Radar as agent tools
 
 ## Connect and ask one question
 
@@ -218,7 +218,7 @@ The generative layer explains; **deterministic screening policy scores.** Histor
 diagnostics retain their served evidence status and eligibility flags and do not become
 validated-backtest or real-money evidence merely because a deterministic engine produced
 them. Screens, not ratings; not investment advice. Institutions without a vetted dossier
-are absent by design — the tools say so rather than inventing a score.
+are absent by design: the tools say so rather than inventing a score.
 
 The three historical status tokens are part of the API contract, not marketing copy:
 `PERIOD_END_PROXY_CONSTRUCTION_PIT` for India,
@@ -228,10 +228,10 @@ serves `validated_backtest_eligible: false` and `real_money_eligible: false`.
 
 ## Siblings from the same lab
 
-- [Seiche](https://api.seiche.info/mcp) — US money-market funding stress (the plumbing)
-- [groundcheck](https://groundcheck.seiche.info) — claim grounding and citation verification
-- Palimpsest (`https://api.seiche.info/palimpsest/mcp`) — live internet-censorship signals
-- [Undertow](https://liquilens-undertow.com/developers/) — the cross market liquidity map: daily tiered board, exit cost at position size, Telegram front door at [t.me/undertow_LiquiLens_bot](https://t.me/undertow_LiquiLens_bot)
+- [Seiche](https://api.seiche.info/mcp): US money-market funding stress (the plumbing)
+- [groundcheck](https://groundcheck.seiche.info): claim grounding and citation verification
+- Palimpsest (`https://api.seiche.info/palimpsest/mcp`): live internet-censorship signals
+- [Undertow](https://liquilens-undertow.com/developers/): the cross market liquidity map, daily tiered board, exit cost at position size, Telegram front door at [t.me/undertow_LiquiLens_bot](https://t.me/undertow_LiquiLens_bot)
 
 Product: [liquilens.in](https://liquilens.in) · Live demo: [demo.liquilens.in](https://demo.liquilens.in)
 

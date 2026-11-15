@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+import unicodedata
 import unittest
 from pathlib import Path
 from typing import Any
@@ -9,6 +10,12 @@ from urllib.parse import urlparse
 
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def _dash_punctuation(text: str) -> list[str]:
+    """Unicode dash punctuation other than the ASCII hyphen-minus."""
+    return sorted({f"U+{ord(char):04X}" for char in text
+                   if char != "-" and unicodedata.category(char) == "Pd"})
 
 
 def _strict_json(path: Path) -> dict[str, Any]:
@@ -104,6 +111,8 @@ class ListingContractTests(unittest.TestCase):
             self.contract["canonical"]["serverManifest"]["repository"]["url"],
             self.contract["canonical"]["repository"],
         )
+        self.assertEqual(self.server["title"], metadata["title"])
+        self.assertEqual(self.server["icons"], metadata["icons"])
         self.assertEqual(self.server["repository"]["source"], "github")
         self.assertLessEqual(len(self.server["description"]), 100)
         self.assertEqual(
@@ -142,6 +151,42 @@ class ListingContractTests(unittest.TestCase):
         ):
             self.assertIn(token, self.readme)
         self.assertNotIn("MCP 1.5.0", self.readme)
+
+    def test_registry_display_metadata_is_plain_and_first_party(self) -> None:
+        # The hosted server answers initialize with this title (read 15 Nov 2026);
+        # the registry card and the server should name the product the same way.
+        self.assertEqual(self.server["title"], "LiquiLens Failure Radar")
+        research = _strict_json(ROOT / "research-data-server.json")
+        for label, text in (
+            ("server title", self.server["title"]),
+            ("server description", self.server["description"]),
+            ("research title", research["title"]),
+            ("research description", research["description"]),
+        ):
+            with self.subTest(field=label):
+                self.assertEqual(_dash_punctuation(text), [], text)
+        self.assertEqual(
+            self.server["icons"],
+            [{
+                "src": "https://liquilens.in/brand/liquilens-mark-512.png",
+                "mimeType": "image/png",
+                "sizes": ["512x512"],
+            }],
+        )
+
+    def test_shipped_listing_text_has_no_dash_punctuation(self) -> None:
+        # GitHub's MCP Registry and VS Code show this repository's README as the
+        # server page, so the listing text follows the no em or en dash rule.
+        paths = sorted(
+            {*ROOT.glob("*.md"), *ROOT.glob("skills/**/*.md")},
+            key=lambda path: path.as_posix(),
+        )
+        self.assertIn(ROOT / "README.md", paths)
+        for path in paths:
+            with self.subTest(path=path.relative_to(ROOT).as_posix()):
+                self.assertEqual(
+                    _dash_punctuation(path.read_text(encoding="utf-8")), []
+                )
 
     def test_secondary_registry_metadata_is_minimal(self) -> None:
         self.assertEqual(
