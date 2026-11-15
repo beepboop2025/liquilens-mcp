@@ -246,3 +246,10 @@ contract and its evidence limits.
 ## Quant research agent integrations
 
 [Native framework tools and cited quant pipeline captures](https://liquilens.in/agents/quant/) connect Seiche funding, LiquiLens bank diagnostics and Undertow market liquidity through compact read-only tables. LangChain/LangGraph, CrewAI, OpenAI Agents and Pydantic AI share one evidence contract and repeat-call revision tokens. Current published history is not an as-published vintage archive. No execution authority or institutional-adoption claim is implied.
+
+## License
+
+The manifests, documentation, scripts and tests in this repository are released
+under the [MIT License](LICENSE); the client skill keeps its MIT No Attribution
+license. The hosted service and its data are governed by separate terms: see
+[NOTICE.md](NOTICE.md).

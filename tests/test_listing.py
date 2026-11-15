@@ -188,6 +188,15 @@ class ListingContractTests(unittest.TestCase):
                     _dash_punctuation(path.read_text(encoding="utf-8")), []
                 )
 
+    def test_license_scope_is_published_with_the_listing(self) -> None:
+        license_text = (ROOT / "LICENSE").read_text(encoding="utf-8")
+        notice = " ".join((ROOT / "NOTICE.md").read_text(encoding="utf-8").split())
+        self.assertTrue(license_text.startswith("MIT License\n"))
+        self.assertIn("https://liquilens.in/terms/", notice)
+        self.assertIn("https://api.liquilens.in/mcp", notice)
+        self.assertIn("MIT No Attribution", notice)
+        self.assertIn("[NOTICE.md](NOTICE.md)", self.readme)
+
     def test_secondary_registry_metadata_is_minimal(self) -> None:
         self.assertEqual(
             self.glama,
