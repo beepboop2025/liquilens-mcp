@@ -1,4 +1,4 @@
-# LiquiLens MCP: the Failure Radar as agent tools
+# LiquiLens MCP: source-cited Indian bank and lender research for AI agents
 
 ## Connect and ask one question
 
@@ -38,8 +38,9 @@ Read the [company and investor story](https://liquilens.in/investors/) and the
 **Try it live:** [liquilens.in/developers](https://liquilens.in/developers/) ·
 **REST catalog:** [api.liquilens.in/api](https://api.liquilens.in/api)
 
-LiquiLens is a failure early-warning system for banks and lenders, built on public
-data with a machine-readable historical-evidence boundary served beside every claim.
+LiquiLens serves filed asset quality, capital, liquidity and funding figures for Indian lenders, each tied to the
+lender's own filing, with free research access by API and MCP. A machine-readable historical-evidence boundary is
+served beside every claim.
 Anonymous discovery on 11 October 2026 returned MCP 1.8.1 with 24 read-only tools
 and 5 guided prompts, so an agent
 reads the same status, eligibility flags and cited record a human sees. The repository
@@ -189,7 +190,7 @@ a downloadable workflow does not imply acceptance into n8n's template library.
 | `evidence_india` | `PERIOD_END_PROXY_CONSTRUCTION_PIT`: 48 institutions across two decades, misses and false alarms included; both eligibility flags false |
 | `evidence_institution` | One Indian institution's construction-PIT crisis replay with sourced quarterly rows |
 | `evidence_markets` | Historical-evidence status for all three markets, with `validated_backtest_eligible` and `real_money_eligible` served explicitly |
-| `evidence_us` | `CURRENT_AMENDED_CONSTRUCTION_PIT`: 552 FDIC failures since 2008, 72.8% recall, 21.7-month median lead and AUC 0.854; both eligibility flags false |
+| `evidence_us` | US historical-evidence status (`CURRENT_AMENDED_CONSTRUCTION_PIT`), read live from `/api/evidence/markets`; both eligibility flags false |
 | `failure_radar_board` | The live board: every Indian lender with a fresh vetted dossier, including failure PD term structure (12/24/36m), RBI action-zone status, funding fragility, market distance to default, and watchlist tier under a published rule |
 | `failure_radar_institution` | One institution in depth: PD trajectory with drivers, PCA/SAF headroom history, forensic screen, market reading |
 | `forward_odds` | Counted forward stress odds for each public-signal layer, withheld until the layer has enough observed history |
@@ -229,10 +230,10 @@ serves `validated_backtest_eligible: false` and `real_money_eligible: false`.
 
 ## Siblings from the same lab
 
-- [Seiche](https://api.seiche.info/mcp): US money-market funding stress (the plumbing)
+- [Seiche](https://api.seiche.info/mcp): free, open research on dollar funding and money markets
 - [groundcheck](https://groundcheck.seiche.info): claim grounding and citation verification
 - Palimpsest (`https://api.seiche.info/palimpsest/mcp`): live internet-censorship signals
-- [Undertow](https://liquilens-undertow.com/developers/): the cross market liquidity map, daily tiered board, exit cost at position size, Telegram front door at [t.me/undertow_LiquiLens_bot](https://t.me/undertow_LiquiLens_bot)
+- [LiquiLens Undertow](https://liquilens-undertow.com/developers/): market liquidity and exit-cost research, with a Telegram front door at [t.me/undertow_LiquiLens_bot](https://t.me/undertow_LiquiLens_bot)
 
 Product: [liquilens.in](https://liquilens.in) · Live demo: [demo.liquilens.in](https://demo.liquilens.in)
 
