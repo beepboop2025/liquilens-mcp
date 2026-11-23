@@ -1,13 +1,13 @@
 {
   "canonical": {
-    "releaseCommit": "d6f99bdf2de14e8ef2f29032cf9561ca8a446de8",
+    "releaseCommit": "a4e7beebc848d1c097d07318a43f1c0fbef861ed",
     "repository": "https://github.com/beepboop2025/LiquiLens",
     "serverManifest": {
       "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
       "name": "io.github.beepboop2025/liquilens",
-      "title": "LiquiLens \u2014 the Failure Radar",
+      "title": "LiquiLens: the record of India's banks and lenders",
       "description": "Free bank research: NPA reconciliation, small finance banks, UCBs and cited evidence limits.",
-      "version": "1.8.1",
+      "version": "1.8.3",
       "repository": {
         "url": "https://github.com/beepboop2025/LiquiLens",
         "source": "github"
@@ -21,7 +21,7 @@
       ]
     }
   },
-  "serverVersion": "1.8.1",
+  "serverVersion": "1.8.3",
   "protocolVersions": [
     "2026-07-28",
     "2025-11-25",
@@ -30,11 +30,13 @@
   ],
   "tools": [
     "bank_asset_quality_review",
+    "bank_credit_land_stress",
     "bank_npa_reconciliation",
     "banking_specialisation_coverage",
     "corporate_transmission_board",
     "crypto_exposure_board",
     "crypto_regime_board",
+    "economy_bond_markets",
     "evidence_europe",
     "evidence_india",
     "evidence_institution",
@@ -44,9 +46,12 @@
     "failure_radar_institution",
     "forward_odds",
     "household_credit_board",
+    "institution_evidence_monitor",
     "institution_research_coverage",
     "institution_review_packet",
     "latest_article",
+    "lending_geography",
+    "ontology_context",
     "rbi_supervisory_tape",
     "research_network",
     "stablecoin_rails_board",
@@ -55,18 +60,20 @@
   ],
   "prompts": [
     "bank_asset_quality_brief",
+    "bank_credit_land_stress_brief",
     "crypto_liquidity_briefing",
+    "entity_briefing",
     "failure_radar_briefing",
     "institution_health_check",
     "stress_evidence_pack"
   ],
   "resourceTemplates": [],
   "registryMetadata": {
-    "version": "1.8.2",
+    "version": "1.8.3",
     "repositoryUrl": "https://github.com/beepboop2025/liquilens-mcp",
     "websiteUrl": "https://liquilens.in/agents/",
-    "description": "Free bank-filing and counterparty research; cited evidence limits; public MCP needs no API key.",
-    "title": "LiquiLens Failure Radar",
+    "description": "Free bank-filing and counterparty research; cited evidence limits; public MCP needs no key.",
+    "title": "LiquiLens: the record of India's banks and lenders",
     "icons": [
       {
         "src": "https://liquilens.in/brand/liquilens-mark-512.png",
