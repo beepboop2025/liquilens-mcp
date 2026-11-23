@@ -41,13 +41,10 @@ Read the [company and investor story](https://liquilens.in/investors/) and the
 LiquiLens serves filed asset quality, capital, liquidity and funding figures for Indian lenders, each tied to the
 lender's own filing, with free research access by API and MCP. A machine-readable historical-evidence boundary is
 served beside every claim.
-Anonymous discovery on 11 October 2026 returned MCP 1.8.1 with 24 read-only tools
-and 5 guided prompts, so an agent
-reads the same status, eligibility flags and cited record a human sees. The repository
-contract separately pins MCP 1.8.1 at
-`d6f99bdf2de14e8ef2f29032cf9561ca8a446de8`, with 23 read-only tools and 5 guided prompts.
-The capability tables below describe that pinned source. Discover the hosted
-endpoint for the current public inventory, including `institution_evidence_monitor`.
+An agent reads the same status, eligibility flags and cited record a human sees.
+The repository contract pins MCP 1.8.3 at
+`a4e7beebc848d1c097d07318a43f1c0fbef861ed`, with 28 read-only tools and 7 guided prompts.
+The capability tables below describe that pinned source.
 
 It now reads both ends of the chain: which institutions are fragile, and whether that
 stress is actually crossing into the real economy: companies rolling paper and drawing
@@ -121,10 +118,9 @@ implementation is maintained in a private core repository. This public mirror pi
 its inspectable capability contract to the reviewed source revision above.
 The [official Registry entry](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.beepboop2025%2Fliquilens/versions/latest)
 uses the name `io.github.beepboop2025/liquilens`. This repository's Registry
-metadata revision 1.8.2 points to the public mirror and free starter kit, with
-the plain title and the LiquiLens mark. The hosted MCP reports version 1.8.1 at
-the same endpoint: 1.8.2 is a metadata only revision ahead of the runtime, not a
-new server release. They remain separately verified contracts. The pinned source
+metadata revision 1.8.3 points to the public mirror and free starter kit, with
+the plain title and the LiquiLens mark. The hosted MCP reports version 1.8.3 at
+the same endpoint. They remain separately verified contracts. The pinned source
 and tool inventory above describe the current runtime. The Registry record
 continues to identify this public mirror.
 
@@ -181,11 +177,13 @@ a downloadable workflow does not imply acceptance into n8n's template library.
 | Tool | What it serves |
 |---|---|
 | `bank_asset_quality_review` | Exact-slug bank review with sourced GNPA/NNPA history, percentage-point changes, distinct PCR definitions and capital/supervisory scope; no new score or credit approval |
+| `bank_credit_land_stress` | Loan quality, the NPA bridge, state NPA and housing loans against a peer block, with geographic context, for exact ids; a district is not measured lending exposure; no score |
 | `bank_npa_reconciliation` | Arithmetic check of a complete caller-supplied NPA movement table; keeps cash recoveries, write-offs, sales and upgrades distinct without authenticating the input |
 | `banking_specialisation_coverage` | Discover covered Indian commercial, small finance and urban cooperative banks, with observed, stale, historical and absent evidence distinguished; not a census or rating |
 | `corporate_transmission_board` | Is funding stress reaching nonfinancial firms? The commercial-paper market, bank credit lines, real-economy confirmation (claims, capex, inventories, openings, business bankruptcies) and a balance-sheet context channel, with a TRANSMITTING/CONTAINED verdict |
 | `crypto_exposure_board` | Cited bank/crypto exposure register joined to Undertow run-risk context; display-only, never an institution score |
 | `crypto_regime_board` | Compact BTC/ETH change-point state and its display-only cross-read against disclosed bank exposure |
+| `economy_bond_markets` | Bond statistics and cross-product economic readings by ISO market, each with its own source dates and state; stale or restricted readings stay gaps |
 | `evidence_europe` | `NAMED_CASE_FILES_CONSTRUCTION_PIT`: seven audited case files, deliberately no cohort claim; both eligibility flags false |
 | `evidence_india` | `PERIOD_END_PROXY_CONSTRUCTION_PIT`: 48 institutions across two decades, misses and false alarms included; both eligibility flags false |
 | `evidence_institution` | One Indian institution's construction-PIT crisis replay with sourced quarterly rows |
@@ -195,9 +193,12 @@ a downloadable workflow does not imply acceptance into n8n's template library.
 | `failure_radar_institution` | One institution in depth: PD trajectory with drivers, PCA/SAF headroom history, forensic screen, market reading |
 | `forward_odds` | Counted forward stress odds for each public-signal layer, withheld until the layer has enough observed history |
 | `household_credit_board` | Is stress transmitting through household balance sheets? Fed delinquency and charge-off legs against each leg's own trailing decade, two-sided revolving-credit velocity, debt service as unscored context |
+| `institution_evidence_monitor` | Bank and NBFC evidence, gaps and review alerts for one record, a watchlist or every tracked record, as of end of day; no scoring or delivery authority |
 | `institution_research_coverage` | Discover institution dossiers, registry entries and reviewed filing facts with separate observed, stale, historical, subset and registry-only states; coverage is not a rating or permission to trade |
 | `institution_review_packet` | One lender's deterministic evidence packet for human review, with coverage and freshness stated explicitly |
 | `latest_article` | Today's exact evidence-led LiquiLens article, or a labelled historical replay when the evidence did not move |
+| `lending_geography` | Co-operative bank operating areas and the dated district environment, by exact id; facts, never a score |
+| `ontology_context` | Resolves a named bank, NBFC, series, market or place, or a CIN, LEI, ISIN, CUSIP or series code, to one canonical id with its links, events and the reads that serve it; routing, not evidence |
 | `rbi_supervisory_tape` | Latest RBI enforcement actions, each linking to the RBI's own page |
 | `research_network` | Bounded source discovery for connected Palimpsest, Seiche and Undertow research with availability and evidence boundaries intact |
 | `stablecoin_rails_board` | Issuer peg, redemption-run, chain-concentration and rail tripwire state; missing data never becomes `CALM` |
@@ -209,7 +210,9 @@ a downloadable workflow does not imply acceptance into n8n's template library.
 | Prompt | Guided playbook |
 |---|---|
 | `bank_asset_quality_brief` | Discover an exact bank slug, review cited NPA history and capital scope, then reconcile only a complete disclosed movement table; preserve stale/missing evidence and supervisory gaps |
+| `bank_credit_land_stress_brief` | Credit and land stress evidence for an exact institution: loan quality, the NPA bridge and dated district context; no score |
 | `crypto_liquidity_briefing` | BTC/ETH regime, stablecoin rails, and disclosed bank links in one display-only evidence pack |
+| `entity_briefing` | Entity briefing across products, starting from one canonical id and the reads it routes to |
 | `failure_radar_briefing` | Board-level institution risk with transmission context from the public US signal layers |
 | `institution_health_check` | One lender health check with the historical-evidence boundary and uncertainty attached |
 | `stress_evidence_pack` | Region-specific evidence for India, the United States, Europe, or the cross-market summary |

@@ -72,8 +72,8 @@ class ListingContractTests(unittest.TestCase):
             names = self.contract[field]
             self.assertEqual(names, sorted(set(names)))
             self.assertTrue(all(re.fullmatch(r"[a-z][a-z0-9_]+", n) for n in names))
-        self.assertEqual(len(self.contract["tools"]), 23)
-        self.assertEqual(len(self.contract["prompts"]), 5)
+        self.assertEqual(len(self.contract["tools"]), 28)
+        self.assertEqual(len(self.contract["prompts"]), 7)
         self.assertEqual(self.contract["resourceTemplates"], [])
 
     def test_pin_sha_version_and_tools_stay_consistent(self) -> None:
@@ -96,9 +96,9 @@ class ListingContractTests(unittest.TestCase):
     def test_server_manifest_matches_the_canonical_contract(self) -> None:
         metadata = self.contract["registryMetadata"]
         self.assertEqual(self.server["version"], metadata["version"])
-        # 1.8.2 is a Registry metadata revision (title, icon) of the 1.8.1 runtime.
-        self.assertEqual(metadata["version"], "1.8.2")
-        self.assertEqual(self.contract["serverVersion"], "1.8.1")
+        # 1.8.3: the Registry metadata and the hosted runtime carry one version again.
+        self.assertEqual(metadata["version"], "1.8.3")
+        self.assertEqual(self.contract["serverVersion"], "1.8.3")
         self.assertEqual(self.server["name"], "io.github.beepboop2025/liquilens")
         self.assertEqual(
             self.server["repository"]["url"],
@@ -156,7 +156,11 @@ class ListingContractTests(unittest.TestCase):
         self.assertEqual(
             table_pattern.findall(prompt_section), self.contract["prompts"]
         )
-        self.assertIn("23 read-only tools and 5 guided prompts", self.readme)
+        self.assertIn(
+            f"{len(self.contract['tools'])} read-only tools and "
+            f"{len(self.contract['prompts'])} guided prompts",
+            self.readme,
+        )
 
     def test_readme_documents_versions_and_evidence_boundary(self) -> None:
         self.assertIn(f"MCP {self.contract['serverVersion']}", self.readme)
@@ -175,7 +179,7 @@ class ListingContractTests(unittest.TestCase):
     def test_registry_display_metadata_is_plain_and_first_party(self) -> None:
         # The hosted server answers initialize with this title (read 15 Nov 2026);
         # the registry card and the server should name the product the same way.
-        self.assertEqual(self.server["title"], "LiquiLens Failure Radar")
+        self.assertEqual(self.server["title"], "LiquiLens: the record of India's banks and lenders")
         research = _strict_json(ROOT / "research-data-server.json")
         for label, text in (
             ("server title", self.server["title"]),
