@@ -76,6 +76,25 @@ def _mapping_keys(tree: ast.Module, name: str,
     return keys
 
 
+def _bank_expansions(core: Path, bank_tree: ast.Module) -> dict[str, list[str]]:
+    """Resolve the one aliased inventory mcp_bank_tools merges, by AST only.
+
+    The core merges the institution-monitoring tools into BANK_TOOLS with
+    ``from institution_monitoring.tools import TOOLS as MONITORING_TOOLS``.
+    Only that exact import is resolved; any other expansion still fails closed.
+    """
+    expansions: dict[str, list[str]] = {}
+    for node in bank_tree.body:
+        if not (isinstance(node, ast.ImportFrom) and node.level == 0
+                and node.module == "institution_monitoring.tools"):
+            continue
+        for alias in node.names:
+            if alias.name == "TOOLS" and alias.asname == "MONITORING_TOOLS":
+                tree = _module(core / "backend" / "institution_monitoring" / "tools.py")
+                expansions["MONITORING_TOOLS"] = _mapping_keys(tree, "TOOLS")
+    return expansions
+
+
 def _literal(tree: ast.Module, name: str) -> Any:
     return ast.literal_eval(_assignment(tree, name))
 
@@ -188,12 +207,26 @@ def verify(core: Path) -> None:
     }
     if not {"BANK_TOOLS", "BANK_PROMPTS"} <= bank_imports:
         raise ValueError("core must import BANK_TOOLS and BANK_PROMPTS from mcp_bank_tools")
-    actual_tools = sorted(_mapping_keys(server_tree, "TOOLS", {
-        "BANK_TOOLS": _mapping_keys(bank_tree, "BANK_TOOLS"),
-    }))
-    actual_prompts = sorted(_mapping_keys(server_tree, "PROMPTS", {
-        "BANK_PROMPTS": _mapping_keys(bank_tree, "BANK_PROMPTS"),
-    }))
+    tool_expansions = {
+        "BANK_TOOLS": _mapping_keys(bank_tree, "BANK_TOOLS", _bank_expansions(core, bank_tree)),
+    }
+    prompt_expansions = {"BANK_PROMPTS": _mapping_keys(bank_tree, "BANK_PROMPTS")}
+    # The ontology tools (core #302) arrive the same way: an exact, un-aliased
+    # import from mcp_ontology_tools, resolved by AST and never executed.
+    ontology_imports = {
+        alias.name for node in server_tree.body
+        if isinstance(node, ast.ImportFrom) and node.module == "mcp_ontology_tools"
+        and node.level == 0
+        for alias in node.names if alias.asname is None
+    }
+    if ontology_imports:
+        if not {"ONTOLOGY_TOOLS", "ONTOLOGY_PROMPTS"} <= ontology_imports:
+            raise ValueError("core must import ONTOLOGY_TOOLS and ONTOLOGY_PROMPTS from mcp_ontology_tools")
+        ontology_tree = _module(core / "backend" / "mcp_ontology_tools.py")
+        tool_expansions["ONTOLOGY_TOOLS"] = _mapping_keys(ontology_tree, "ONTOLOGY_TOOLS")
+        prompt_expansions["ONTOLOGY_PROMPTS"] = _mapping_keys(ontology_tree, "ONTOLOGY_PROMPTS")
+    actual_tools = sorted(_mapping_keys(server_tree, "TOOLS", tool_expansions))
+    actual_prompts = sorted(_mapping_keys(server_tree, "PROMPTS", prompt_expansions))
     modern = _literal(protocol_tree, "MODERN_PROTOCOL_VERSION")
     primary = _literal(protocol_tree, "PROTOCOL_VERSION")
     legacy_node = _assignment(protocol_tree, "LEGACY_PROTOCOL_VERSIONS")

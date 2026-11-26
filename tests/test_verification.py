@@ -42,6 +42,26 @@ class StaticPinTests(unittest.TestCase):
             with self.subTest(source=source), self.assertRaises(ValueError):
                 pin._mapping_keys(ast.parse(source), "TOOLS", {"BANK_TOOLS": ["bank"]})
 
+    def test_monitoring_inventory_resolves_only_through_its_exact_import(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            core = Path(temporary)
+            (core / "backend" / "institution_monitoring").mkdir(parents=True)
+            (core / "backend" / "institution_monitoring" / "tools.py").write_text(
+                "TOOLS = {'monitor': do_not_execute()}\n")
+            exact = ast.parse("from institution_monitoring.tools import TOOLS as MONITORING_TOOLS\n"
+                              "BANK_TOOLS = {**MONITORING_TOOLS, 'bank': None}\n")
+            self.assertEqual(
+                pin._mapping_keys(exact, "BANK_TOOLS", pin._bank_expansions(core, exact)),
+                ["monitor", "bank"])
+            for source in (
+                "from institution_monitoring.tools import TOOLS as OTHER_TOOLS\nBANK_TOOLS = {**MONITORING_TOOLS}\n",
+                "from elsewhere.tools import TOOLS as MONITORING_TOOLS\nBANK_TOOLS = {**MONITORING_TOOLS}\n",
+                "BANK_TOOLS = {**MONITORING_TOOLS}\n",
+            ):
+                tree = ast.parse(source)
+                with self.subTest(source=source), self.assertRaisesRegex(ValueError, "unsupported dictionary expansion"):
+                    pin._mapping_keys(tree, "BANK_TOOLS", pin._bank_expansions(core, tree))
+
     def test_exact_source_pin_manifest_and_import_are_required(self):
         contract = json.loads((ROOT / "contract.json").read_text())
         manifest = contract["canonical"]["serverManifest"]
