@@ -72,8 +72,8 @@ class ListingContractTests(unittest.TestCase):
             names = self.contract[field]
             self.assertEqual(names, sorted(set(names)))
             self.assertTrue(all(re.fullmatch(r"[a-z][a-z0-9_]+", n) for n in names))
-        self.assertEqual(len(self.contract["tools"]), 23)
-        self.assertEqual(len(self.contract["prompts"]), 5)
+        self.assertEqual(len(self.contract["tools"]), 28)
+        self.assertEqual(len(self.contract["prompts"]), 7)
         self.assertEqual(self.contract["resourceTemplates"], [])
 
     def test_pin_sha_version_and_tools_stay_consistent(self) -> None:
@@ -96,9 +96,11 @@ class ListingContractTests(unittest.TestCase):
     def test_server_manifest_matches_the_canonical_contract(self) -> None:
         metadata = self.contract["registryMetadata"]
         self.assertEqual(self.server["version"], metadata["version"])
-        # 1.8.2 is a Registry metadata revision (title, icon) of the 1.8.1 runtime.
-        self.assertEqual(metadata["version"], "1.8.2")
-        self.assertEqual(self.contract["serverVersion"], "1.8.1")
+        # 1.8.4: the Registry metadata and the hosted runtime carry one version,
+        # and the pinned core's own server.json is this listing's server.json.
+        self.assertEqual(metadata["version"], "1.8.4")
+        self.assertEqual(self.contract["serverVersion"], "1.8.4")
+        self.assertEqual(self.server, self.contract["canonical"]["serverManifest"])
         self.assertEqual(self.server["name"], "io.github.beepboop2025/liquilens")
         self.assertEqual(
             self.server["repository"]["url"],
@@ -108,10 +110,19 @@ class ListingContractTests(unittest.TestCase):
         self.assertEqual(self.server["websiteUrl"], "https://liquilens.in/agents/")
         self.assertEqual(self.server["websiteUrl"], metadata["websiteUrl"])
         self.assertEqual(self.server["description"], metadata["description"])
+        # Since 1.8.4 the core's own manifest names this public listing
+        # repository. canonical.repository stays the core repository that holds
+        # releaseCommit: the one the verify workflow checks out at that commit.
         self.assertEqual(
             self.contract["canonical"]["serverManifest"]["repository"]["url"],
-            self.contract["canonical"]["repository"],
+            metadata["repositoryUrl"],
         )
+        workflow = (ROOT / ".github" / "workflows" / "verify.yml").read_text(encoding="utf-8")
+        self.assertEqual(
+            re.findall(r"^ +repository: (\S+)$", workflow, re.MULTILINE),
+            [self.contract["canonical"]["repository"].removeprefix("https://github.com/")],
+        )
+        self.assertNotEqual(self.contract["canonical"]["repository"], metadata["repositoryUrl"])
         self.assertEqual(self.server["title"], metadata["title"])
         self.assertEqual(self.server["icons"], metadata["icons"])
         self.assertEqual(self.server["repository"]["source"], "github")
@@ -130,9 +141,10 @@ class ListingContractTests(unittest.TestCase):
             self.assertTrue(parsed.netloc)
 
     def test_readme_states_the_registry_revision_against_the_runtime(self) -> None:
-        # A Registry card may lead the hosted server's own version only as a
-        # metadata revision, and the README (the server page on GitHub's MCP
-        # Registry and in VS Code) must say so in words.
+        # Since 1.8.4 the Registry card and the hosted server carry one version.
+        # A later card may lead the server's own version only as a metadata
+        # revision, and the README (the server page on GitHub's MCP Registry and
+        # in VS Code) must then say so in words; while they match it must not.
         registry = self.contract["registryMetadata"]["version"]
         runtime = self.contract["serverVersion"]
         as_tuple = lambda version: tuple(int(part) for part in version.split("."))
@@ -140,12 +152,12 @@ class ListingContractTests(unittest.TestCase):
         normalized = " ".join(self.readme.split())
         self.assertIn(f"Registry metadata revision {registry} points to", normalized)
         self.assertIn(f"The hosted MCP reports version {runtime} at", normalized)
+        ahead = "is a metadata only revision ahead of the runtime"
         if registry != runtime:
-            self.assertIn(
-                f"{registry} is a metadata only revision ahead of the runtime, "
-                "not a new server release",
-                normalized,
-            )
+            self.assertIn(f"{registry} {ahead}, not a new server release", normalized)
+        else:
+            self.assertIn("the Registry metadata and the runtime carry one version", normalized)
+            self.assertNotIn(ahead, normalized)
         self.assertNotIn("happen to share a version number", normalized)
 
     def test_readme_advertises_every_capability_exactly_once(self) -> None:
@@ -156,7 +168,11 @@ class ListingContractTests(unittest.TestCase):
         self.assertEqual(
             table_pattern.findall(prompt_section), self.contract["prompts"]
         )
-        self.assertIn("23 read-only tools and 5 guided prompts", self.readme)
+        self.assertIn(
+            f"{len(self.contract['tools'])} read-only tools and "
+            f"{len(self.contract['prompts'])} guided prompts",
+            self.readme,
+        )
 
     def test_readme_documents_versions_and_evidence_boundary(self) -> None:
         self.assertIn(f"MCP {self.contract['serverVersion']}", self.readme)
@@ -173,9 +189,11 @@ class ListingContractTests(unittest.TestCase):
         self.assertNotIn("MCP 1.5.0", self.readme)
 
     def test_registry_display_metadata_is_plain_and_first_party(self) -> None:
-        # The hosted server answers initialize with this title (read 15 Nov 2026);
-        # the registry card and the server should name the product the same way.
-        self.assertEqual(self.server["title"], "LiquiLens Failure Radar")
+        # The hosted server answers initialize with this title (read 26 Nov 2026,
+        # UTC); the registry card, the pinned core manifest and the server name
+        # the product the same way.
+        self.assertEqual(self.server["title"], "LiquiLens: the record of India's banks and lenders")
+        self.assertEqual(self.server["title"], self.contract["canonical"]["serverManifest"]["title"])
         research = _strict_json(ROOT / "research-data-server.json")
         for label, text in (
             ("server title", self.server["title"]),
