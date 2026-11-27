@@ -1,14 +1,14 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.beepboop2025/liquilens",
-  "title": "LiquiLens Failure Radar",
-  "description": "Free bank-filing and counterparty research; cited evidence limits; public MCP needs no API key.",
-  "version": "1.8.2",
+  "title": "LiquiLens: the record of India's banks and lenders",
+  "description": "Free bank-filing and counterparty research; cited evidence limits; the public MCP is open to all.",
+  "version": "1.8.4",
+  "websiteUrl": "https://liquilens.in/agents/",
   "repository": {
     "url": "https://github.com/beepboop2025/liquilens-mcp",
     "source": "github"
   },
-  "websiteUrl": "https://liquilens.in/agents/",
   "icons": [
     {
       "src": "https://liquilens.in/brand/liquilens-mark-512.png",

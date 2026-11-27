@@ -62,6 +62,48 @@ class StaticPinTests(unittest.TestCase):
                 with self.subTest(source=source), self.assertRaisesRegex(ValueError, "unsupported dictionary expansion"):
                     pin._mapping_keys(tree, "BANK_TOOLS", pin._bank_expansions(core, tree))
 
+    def test_composed_core_with_monitoring_and_ontology_inventories_verifies(self):
+        contract = json.loads((ROOT / "contract.json").read_text())
+        with tempfile.TemporaryDirectory() as temporary:
+            core = Path(temporary)
+            backend = core / "backend"
+            (backend / "institution_monitoring").mkdir(parents=True)
+            monitoring = ["institution_evidence_monitor"]
+            ontology_tools = ["economy_bond_markets", "ontology_context"]
+            ontology_prompts = ["entity_briefing"]
+            bank_tools = [n for n in contract["tools"] if n.startswith("bank")]
+            bank_prompts = [n for n in contract["prompts"] if n.startswith("bank")]
+            rest_tools = [n for n in contract["tools"] if n not in {*bank_tools, *monitoring, *ontology_tools}]
+            rest_prompts = [n for n in contract["prompts"] if n not in {*bank_prompts, *ontology_prompts}]
+            (backend / "institution_monitoring" / "tools.py").write_text(
+                f"TOOLS = {dict.fromkeys(monitoring)!r}\n")
+            (backend / "mcp_bank_tools.py").write_text(
+                "from institution_monitoring.tools import TOOLS as MONITORING_TOOLS\n"
+                f"BANK_TOOLS = {{**MONITORING_TOOLS, {', '.join(repr(n) + ': None' for n in bank_tools)}}}\n"
+                f"BANK_PROMPTS = {dict.fromkeys(bank_prompts)!r}\n")
+            (backend / "mcp_ontology_tools.py").write_text(
+                f"ONTOLOGY_TOOLS = {dict.fromkeys(ontology_tools)!r}\n"
+                f"ONTOLOGY_PROMPTS = {dict.fromkeys(ontology_prompts)!r}\n")
+            server_source = (
+                "from mcp_bank_tools import BANK_TOOLS, BANK_PROMPTS\n"
+                "from mcp_ontology_tools import ONTOLOGY_TOOLS, ONTOLOGY_PROMPTS\n"
+                f"TOOLS = {{**BANK_TOOLS, **ONTOLOGY_TOOLS, {', '.join(repr(n) + ': None' for n in rest_tools)}}}\n"
+                f"PROMPTS = {{**BANK_PROMPTS, **ONTOLOGY_PROMPTS, {', '.join(repr(n) + ': None' for n in rest_prompts)}}}\n")
+            (backend / "mcp_server.py").write_text(server_source)
+            versions = contract["protocolVersions"]
+            (backend / "mcp_protocol.py").write_text(
+                f"MODERN_PROTOCOL_VERSION = {versions[0]!r}\n"
+                f"PROTOCOL_VERSION = {versions[1]!r}\n"
+                f"LEGACY_PROTOCOL_VERSIONS = (PROTOCOL_VERSION, {versions[2]!r}, {versions[3]!r})\n"
+                f"SERVER_VERSION = {contract['serverVersion']!r}\n")
+            (core / "server.json").write_text(json.dumps(contract["canonical"]["serverManifest"]))
+            with patch.object(pin.subprocess, "check_output", return_value=contract["canonical"]["releaseCommit"]), redirect_stdout(io.StringIO()):
+                pin.verify(core)
+                (backend / "mcp_server.py").write_text(server_source.replace(
+                    "import ONTOLOGY_TOOLS, ONTOLOGY_PROMPTS", "import ONTOLOGY_TOOLS"))
+                with self.assertRaisesRegex(ValueError, "must import ONTOLOGY_TOOLS and ONTOLOGY_PROMPTS"):
+                    pin.verify(core)
+
     def test_exact_source_pin_manifest_and_import_are_required(self):
         contract = json.loads((ROOT / "contract.json").read_text())
         manifest = contract["canonical"]["serverManifest"]
@@ -149,22 +191,23 @@ class StaticPinTests(unittest.TestCase):
         contract = json.loads((ROOT / "contract.json").read_text())
         core = contract["canonical"]["serverManifest"]
         metadata = contract["registryMetadata"]
-        # The pinned core still carries the old em dash title; the projection
-        # replaces it, so the published card never inherits it.
-        self.assertIn("—", core["title"])
+        # Since 1.8.4 the pinned core manifest carries the card's own title, with
+        # no dash punctuation; the projection still decides the published card.
+        self.assertEqual(pin._dash_punctuation(core["title"]), [])
         self.assertEqual(pin._public_registry_manifest(core, metadata)["title"],
-                         "LiquiLens Failure Radar")
+                         core["title"])
+        # Escaped so this file carries no dash punctuation of its own.
         for field, value in (
-            ("title", "LiquiLens — the Failure Radar"),
-            ("title", "LiquiLens – Failure Radar"),
-            ("title", "LiquiLens ― Failure Radar"),
-            ("title", "LiquiLens ‑ Failure Radar"),
+            ("title", "LiquiLens \u2014 the Failure Radar"),
+            ("title", "LiquiLens \u2013 Failure Radar"),
+            ("title", "LiquiLens \u2015 Failure Radar"),
+            ("title", "LiquiLens \u2011 Failure Radar"),
             ("title", ""),
             ("title", " LiquiLens Failure Radar"),
             ("title", "LiquiLens\nFailure Radar"),
             ("title", "L" * 101),
             ("title", None),
-            ("description", "Free bank research — cited evidence limits."),
+            ("description", "Free bank research \u2014 cited evidence limits."),
         ):
             with self.subTest(field=field, value=value), self.assertRaises(ValueError):
                 pin._public_registry_manifest(core, dict(metadata, **{field: value}))
@@ -221,20 +264,23 @@ class StaticPinTests(unittest.TestCase):
                 self.assertEqual(projected["icons"], value)
                 self.assertIsNot(projected["icons"][0], value[0])
 
-    def test_registry_metadata_can_match_the_caught_up_runtime(self):
+    def test_registry_metadata_matches_the_runtime_and_never_trails_it(self):
         contract = json.loads((ROOT / "contract.json").read_text())
         core = copy.deepcopy(contract["canonical"]["serverManifest"])
         metadata = contract["registryMetadata"]
-        core["version"] = metadata["version"]
+        # Since 1.8.4 the Registry metadata and the pinned runtime carry one version.
+        self.assertEqual(core["version"], metadata["version"])
+        self.assertEqual(core["version"], contract["serverVersion"])
         self.assertEqual(pin._public_registry_manifest(core, metadata)["version"],
                          metadata["version"])
-        # The 1.8.2 metadata revision may lead the 1.8.1 runtime it describes ...
-        for runtime in ("1.8.1", "1.8.0"):
+        # The verifier still accepts a metadata only revision ahead of an older
+        # runtime ...
+        for runtime in ("1.8.3", "1.8.0"):
             core["version"] = runtime
             self.assertEqual(pin._public_registry_manifest(core, metadata)["version"],
                              metadata["version"])
-        # ... but never trail a newer runtime.
-        for runtime in ("1.8.3", "1.9.0", "2.0.0"):
+        # ... but never one that trails a newer runtime.
+        for runtime in ("1.8.5", "1.9.0", "2.0.0"):
             core["version"] = runtime
             with self.subTest(runtime=runtime), self.assertRaisesRegex(ValueError, "must not precede"):
                 pin._public_registry_manifest(core, metadata)
